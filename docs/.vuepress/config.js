@@ -32,6 +32,10 @@ module.exports = {
                         link: "/webBase/"
                     },
                     {
+                        text:'webpack',
+                        link:"/webpack/"
+                    },
+                    {
                         text: '项目',
                         link: '/items/'
                     },
@@ -51,9 +55,12 @@ module.exports = {
 						'数组操作',
                         'vue',
                         'react',
-                        'webpack',
                         'items',
                         'exam'
+                    ],
+                    '/webpack/':[
+                        // '',
+                        // 'base'
                     ],
                     '/items/': [
                         '',
