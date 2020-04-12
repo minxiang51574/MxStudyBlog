@@ -36,13 +36,13 @@ module.exports = {
                         link:"/webpack/"
                     },
                     {
+                        text:'vue',
+                        link:'/vue/'
+                    },
+                    {
                         text: '项目',
                         link: '/items/'
                     },
-					// {
-					// 	text: 'Resume',
-					// 	link: '/resume/'
-					// },
 				],
 				sidebar: {
 					'/webBase/': [
@@ -53,15 +53,12 @@ module.exports = {
                         'JS',
 						'ES6',
 						'数组操作',
-                        'vue',
                         'react',
                         'items',
                         'exam'
                     ],
-                    '/webpack/':[
-                        // '',
-                        // 'base'
-                    ],
+                    '/webpack/':[],
+                    '/vue/': [],
                     '/items/': [
                         '',
                         'vue-admin',

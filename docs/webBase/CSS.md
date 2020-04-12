@@ -24,8 +24,8 @@ box-sizing: border-box 是 IE 盒子模型 (个人习惯会常用)
 
   1.行内元素: `text-align:center` <br>
   2.块级元素: `margin: 0 auto` <br>
-  3.绝对定位和移动: `absolute + transform</font>` <br> 
-  4.绝对定位和负边距: `absolute + margin</font>` <br> 
+  3.绝对定位和移动: `absolute + transform` <br> 
+  4.绝对定位和负边距: `absolute + margin` <br> 
   5.flex布局: `flex + justify-content:center`<br> 
 
 - **垂直居中**:

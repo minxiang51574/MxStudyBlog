@@ -176,15 +176,75 @@ function f1() {
 f1();
 ```
 #### 使用场景？缺点？
-闭包用途？优点
-1、读取函数内部的变量。
-2、让这些变量的值始终保持在内存中。不会再f1调用后被自动清除。
-3、方便调用上下文的局部变量。利于代码封装。
-缺点？
-1.由于闭包会使得函数中的变量都被保存在内存中，内存消耗很大，所以不能滥用闭包，否则会造成网页的性能问题，在IE中可能导致内存泄露。解决方法是，在退出函数之前，将不使用的局部变量全部删除。
-2.闭包会在父函数外部，改变父函数内部变量的值。所以，如果你把父函数当作对象（object）使用，把闭包当作它的公用方法（Public Method），把内部变量当作它的私有属性（private value），这时一定要小心，不要随便改变父函数内部变量的值。
+闭包用途？优点 
 
+- 1、读取函数内部的变量。
+- 2、让这些变量的值始终保持在内存中。不会再f1调用后被自动清除。
+- 3、方便调用上下文的局部变量。利于代码封装。
+
+缺点？
+
+- 1.由于闭包会使得函数中的变量都被保存在内存中，内存消耗很大，所以不能滥用闭包，否则会造成网页的性能问题，在IE中可能导致内存泄露。解决方法是，在退出函数之前，将不使用的局部变量全部删除。
+- 2.闭包会在父函数外部，改变父函数内部变量的值。所以，如果你把父函数当作对象（object）使用，把闭包当作它的公用方法（Public Method），把内部变量当作它的私有属性（private value），这时一定要小心，不要随便改变父函数内部变量的值。
+
+```js
+闭包应用
+   for (let i = 0; i < 5; i++) {
+         (function (i) {  // j = i
+            setTimeout(function () {
+                console.log(i);
+            }, 1000);
+        })(i);
+    }
+```
+## 函数柯里化
+```js
+function add(a) {
+            function sum(b) { // 使用闭包
+                a = a + b; // 累加
+                return sum;
+            }
+            sum.toString = function () { // 重写toSting() 方法
+                return a;
+            }
+            return sum; // 返回一个函数
+        }
+
+console.log(add(1)(3)(5)) // 9
+
+
+最后再扩展一道经典面试题
+// 实现一个add方法，使计算结果能够满足如下预期：
+add(1)(2)(3) = 6;
+add(1, 2, 3)(4) = 10;
+add(1)(2)(3)(4)(5) = 15;
+
+function add() {
+    // 第一次执行时，定义一个数组专门用来存储所有的参数
+    var _args = Array.prototype.slice.call(arguments);
+
+    // 在内部声明一个函数，利用闭包的特性保存_args并收集所有的参数值
+    var _adder = function() {
+        _args.push(...arguments);
+        return _adder;
+    };
+
+    // 利用toString隐式转换的特性，当最后执行时隐式转换，并计算最终的值返回
+    _adder.toString = function () {
+        return _args.reduce(function (a, b) {
+            return a + b;
+        });
+    }
+    return _adder;
+}
+
+add(1)(2)(3)                // 6
+add(1, 2, 3)(4)             // 10
+add(1)(2)(3)(4)(5)          // 15
+add(2, 6)(1)                // 9
+```
 ## 继承
+
 
 #### 必问 要求能手写几种继承
 
@@ -540,10 +600,10 @@ Function.prototype.myBind = function (obj) {
             }
         }
         o.fn(1, 2, 3) // "o" 1 2 3
-        o.fn.call(test, 1, 2, 3,4) // "test" 1 2 3
-        o.fn.myCall(test, 1, 2, 3,4) // "test" 1 2 3
-        o.fn.apply(test,[1,2,4])    //test 1 2 3 4
-        o.fn.myApply(test,[1,2,4])  //test 1 2 3 4
+        o.fn.call(test, 1, 2, 3,4) // "test" 1 2 3 4
+        o.fn.myCall(test, 1, 2, 3,4) // "test" 1 2 3 4
+        o.fn.apply(test,[1,2,4])    //test 1 2  4
+        o.fn.myApply(test,[1,2,4])  //test 1 2  4
         o.fn.bind(test,1,6,7)()    //test 1 6 7
         o.fn.myBind(test,1,6,7)()  //test 1 6 7
 ```
