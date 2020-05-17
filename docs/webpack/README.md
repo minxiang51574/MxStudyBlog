@@ -49,7 +49,105 @@ webpack是收把项目当作一个整体，通过一个给定的的主文件，w
 - 3.使用Tree Shaking剔除JS死代码
 - 4.缓存
 
-### 优化构建速度
+### 7-1优化构建速度
+1.使用DllPlugin减少基础模块编译次数
+2.使用HappyPack开启多进程Loader转换
+3.使用ParallelUglifyPlugin开启多进程压缩JS文件
+4.使用Externals忽略一些文件 使用CDN 
+
+### 7-2压缩文件体积
+1.区分环境--减小生产环境代码体积
+2.压缩js css
+3.使用Tree Shaking剔除JS死代码
+
+### 7-3-加速网络请求 
+1.使用CDN加速静态资源加载
+2.抽取公共代码，以利用缓存
+3分割代码以按需加载
+
+### noParse IgnorePlugin DLLPlugin
+
+> noParse 在引入一些第三方模块时，如jq等，我们知道其内部肯定不会依赖其他模块，因为我们用到的只是一个单独的js或者css文件，所以此时如果webpack再去解析他们的内部依赖关系，其实是非常浪费时间的，就需要阻止webpack浪费精力去解析这些明知道没有依赖的库，可以在webpack的配置文件的module节点下加上noParse，并配置正则来确定不需要解析依赖关系的模块
+
+> IgnorePlugin 在引入一些第三方模块时，例如momentJS、dayJS，其内部会做i18n处理，所以会包含很多语言包，而语言包打包时会比较占用空间，如果项目只需要用到中文或者少数语言，可以忽略掉所有的语言包，然后按需引入语言包，从而使得构建效率更高，打包生成的文件更小
+
+> DLLPlugin在引入一些第三方模块时，例如Vue、React等，这些框架的文件一般都是不会修改的，而每次打包都需要去解析他们，也会影响打包速度，就算是做了拆分，也只是提高了上线后的用户访问速度，并不会提高构建速度，所以如果需要提高构建速度，应该使用动态链接库的方式，类似windows的dll文件.借助DLLPlugin插件实现将这些框架作为一个个的动态链接库，只构建一次，以后的每次构建都只会生成自己的业务代码，可以很好的提高构建效率
+
+
+
+## webpack编写一个插件plugins
+```js
+//loader是一个函数，插件是一个类
+class CopyrightWebpackPlugin {
+　　/**
+　　* compiler是webpack的一个实例，这个实例存储了webpack各种信息，所有打包信息
+　　* https://webpack.js.org/api/compiler-hooks
+　　* 官网里面介绍了compiler里面有个hooks这样的概念
+　　* hooks是钩子的意思，里面定义了时刻值
+　　*/
+　　apply(compiler) {
+　　/**
+　　* 用到了hooks，emit这个时刻，在输出资源之前，这里官网告诉我们是一个异步函数
+　　* compilation是这一次的打包信息，所以跟compiler是不一样的
+　　* tapAsync接受两个参数，第一个是名字，
+　　*/
+　　compiler.hooks.emit.tapAsync('CopyrightWebpackPlugin',(compilation, cb)=>{
+　　　　debugger;
+　　　　compilation.assets['copyright.txt'] = {
+　　　　　　source: function(){
+　　　　　　　　return 'copyright by q'
+　　　　　　},
+　　　　　　size: function() {
+　　　　　　　　return 15
+　　　　　　}
+　　　　};
+　　　　// 最后一定要调用cb
+　　　　cb();
+　　})
+　　/**
+　　* 同步的时刻跟同步的时刻写代码的方式不一样
+　　* 同步的时刻，后面只要一个参数就可以了
+　　*/
+　　compiler.hooks.done.tap('CopyrightWebpackPlugin',(compilation) => {
+　　　　console.log('compiler');
+　　})
+　　}
+}
+module.exports = CopyrightWebpackPlugin;
+```
+
+## webpack编写一个插件loader
+```js
+   // webpack.config.js
+      module.exports = {
+        //...
+        module: {
+          rules: [
+            {
+              test: /\.txt$/,
+              use: {
+                loader: path.resolve(__dirname, './txt-loader.js'),
+                options: {
+                  name: 'YOLO'
+                }
+              }
+            }
+          ]
+        }
+      }
+
+
+	// txt-loader.js
+   var utils = require('loader-utils')
+  //（格式很简单，重点在于loader-utils，loaderUitls.getOptions可获取webpack配置rules中的options以供使用 ）
+   module.exports = function (source) {
+   const options = utils.getOptions(this)|| {} ; //
+
+   source = source.replace(/\[name\]/g, options.name);
+   return source
+   }
+
+```
 
 ## 8.webpack与gulp区别
 前端开发和其他开发工作的主要区别，首先是前端是基于多语言、多层次的编码和组织工作，其次前端产品的交付是基于浏览器，这些资源是通过增量加载的方式运行到浏览器端，如何在开发环境组织好这些碎片化的代码和资源，并且保证他们在浏览器端快速、优雅的加载和更新，就需要一个模块化系统，这个理想中的模块化系统是前端工程师多年来一直探索的难题
