@@ -2,7 +2,7 @@
  * @Description: In User Settings Edit
  * @Author: your name
  * @Date: 2019-08-29 09:21:47
- * @LastEditTime: 2019-08-29 16:01:47
+ * @LastEditTime: 2020-05-13 22:33:08
  * @LastEditors: Please set LastEditors
  -->
 # ES6
@@ -47,6 +47,19 @@ for (let i = 0; i < 5; i++) {
 
 ### const
 const一旦声明不可以被更改 常用来声明全局变量
+
+## 箭头函数
+
+### 箭头函数和普通函数的区别？
+- 1.改变this的指向，会捕获其所在的上下文的this值，作为自己的this值
+- 2.箭头是匿名函数，不能作为构造函数，不能使用new。
+- 3.箭头函数不绑定arguments，取而代之用rest参数...解决
+- 4.箭头函数没有原型属性
+
+### 箭头函数在什么情况下不适用
+- 1.定义对象的方法时
+- 2.定义原型方式时
+- 3.构造函数 
 
 ## 字符串拼接
 

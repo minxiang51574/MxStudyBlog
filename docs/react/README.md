@@ -69,6 +69,33 @@ react-router-dom 提供两个路由器BrowserRouter和HashRoauter。前者基于
  - 在显示列表或表格时始终使用 Keys，这会让 React 的更新速度更快
  - 代码分离是将代码插入到单独的文件中，只加载模块或部分所需的文件的技术
 
+ ### react-router-dom
+ ```js
+ import { BrowserRouter , Route } from "react-router-dom"
+ <BrowserRouter>
+        <Route path='/' exact component={Home}></Route>
+        <Route path="/detail/:id" exact component={Detail}> </Route>
+        <Route path='/write' exact component={Write}></Route>
+        <Route path="/login" exact component={Login} ></Route>
+</BrowserRouter>
+ ```
+
+  ### Immutable.js
+ ```js
+Immutable数据就是一旦创建，就不能更改的数据。
+每当对Immutable对象进行修改的时候，就会返回一个新的Immutable对象，以此来保证数据的不可变
+
+import { fromJS } from "immutable"
+fromJS将一个js数据转换为Immutable类型的数据
+const dafaultState = fromJS({
+    focused: false,
+    mouseIn: false,
+    list:[],
+    page:1,
+    totalPage:1,
+});
+
+ ```
  ### redux工作流程
 
  ![dd](../redux.jpg)
@@ -82,6 +109,8 @@ react-router-dom 提供两个路由器BrowserRouter和HashRoauter。前者基于
 
 ### Redux-thunk
 使用了redux-thunk后，store中reducer就不仅仅接受一个action对象了，它可以接受一个函数了
+
+简单的action作为函数，在action进行异步操作，发出新的action。
 
 ```js
 //actionCreators
@@ -106,3 +135,20 @@ export const getTodoList = () => {
 
 
 ### Redux-saga
+Redux-saga是一个用于管理 Redux 应用异步操作的中间件
+本质都是为了解决异步action的问题
+
+### vue和React异同
+- react与Vue只有框架的骨架，其他的功能如路由、状态管理等是框架分离的组件
+- 都使用虚拟dom
+- React与Vue都鼓励组件化应用
+
+- 1.react是类式的写法;vue是声明式的写法
+- 2.react通过js来操作一切jsx语法
+- 3.react数据是不是可变的;vue的思想是响应式的，也就是基于是数据可变
+
+
+react整体的思路就是函数式，所以推崇纯组件，数据不可变，单向数据流，而vue是基于可变数据的，支持双向绑定。
+react组件的扩展一般是通过高阶组件，而vue组件会使用mixin。
+vue内置了很多功能，而react做的很少，很多都是由社区来完成的。
+vue追求的是开发的简单，而react更在乎方式是否正确

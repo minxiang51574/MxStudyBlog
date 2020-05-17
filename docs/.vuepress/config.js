@@ -32,6 +32,10 @@ module.exports = {
                         link: "/webBase/"
                     },
                     {
+                        text: '前端进阶',
+                        link: "/webImprove/"
+                    },
+                    {
                         text:'webpack',
                         link:"/webpack/"
                     },
@@ -40,9 +44,17 @@ module.exports = {
                         link:'/vue/'
                     },
                     {
-                        text: '项目',
-                        link: '/items/'
+                        text: 'react',
+                        link: '/react/'
                     },
+                    {
+                        text: 'node',
+                        link: '/node/'
+                    },
+                    // {
+                    //     text: '项目',
+                    //     link: '/items/'
+                    // },
 				],
 				sidebar: {
 					'/webBase/': [
@@ -53,17 +65,22 @@ module.exports = {
                         'JS',
 						'ES6',
 						'数组操作',
-                        'react',
-                        'items',
-                        'exam'
+                        // 'items',
+                        // 'exam'
+                    ],
+                    '/webImprove/': [
+                        '',
+                        '缓存',
                     ],
                     '/webpack/':[],
                     '/vue/': [],
-                    '/items/': [
-                        '',
-                        'vue-admin',
-                        'react-jianshu',
-                    ],
+                    '/react/': [],
+                    '/node/': [],
+                    // '/items/': [
+                    //     '',
+                    //     'vue-admin',
+                    //     'react-jianshu',
+                    // ],
 				}
 			}
 		}
