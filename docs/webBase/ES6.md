@@ -1,10 +1,3 @@
-<!--
- * @Description: In User Settings Edit
- * @Author: your name
- * @Date: 2019-08-29 09:21:47
- * @LastEditTime: 2020-05-13 22:33:08
- * @LastEditors: Please set LastEditors
- -->
 # ES6
 :::  warning 这里只归档常用的
 详情文档 [阮一峰ECMAScript 6 入门](http://es6.ruanyifeng.com/#docs/let)

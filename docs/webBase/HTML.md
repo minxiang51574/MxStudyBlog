@@ -1,10 +1,3 @@
-<!--
- * @Description: In User Settings Edit
- * @Author: your name
- * @Date: 2019-08-29 09:21:47
- * @LastEditTime: 2019-08-29 11:28:11
- * @LastEditors: Please set LastEditors
- -->
 # HTML
 
 ## html语义化

@@ -1,10 +1,3 @@
-<!--
- * @Description: In User Settings Edit
- * @Author: your name
- * @Date: 2019-08-29 09:21:47
- * @LastEditTime: 2019-08-29 10:58:58
- * @LastEditors: Please set LastEditors
- -->
 # HTTP
 
 - TCP协议（传输控制协议）:应用程序之间的通信
