@@ -2,17 +2,17 @@
  * @Description: In User Settings Edit
  * @Author: your name
  * @Date: 2019-08-29 09:21:47
- * @LastEditTime: 2019-08-29 16:34:34
+ * @LastEditTime: 2020-11-23 16:43:24
  * @LastEditors: Please set LastEditors
  */
 module.exports = {
 	head: [
 		['link', {rel: 'icon', href: '/logo.png'}]
 	],
-	base: '/MxBlog/',
+	base: '/blog/',
 	locales: {
 		'/': {
-			title: 'MxBlog',
+			title: 'blog',
 			description: '记录这一路走来'
 		}
 	},
