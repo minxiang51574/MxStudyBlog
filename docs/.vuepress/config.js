@@ -1,9 +1,7 @@
 /*
- * @Description: In User Settings Edit
- * @Author: your name
- * @Date: 2019-08-29 09:21:47
- * @LastEditTime: 2020-11-23 16:43:24
- * @LastEditors: Please set LastEditors
+ * @Author: MX
+ * @Date: 2020-11-23 15:18:53
+ * @Description: 
  */
 module.exports = {
 	head: [
@@ -13,7 +11,7 @@ module.exports = {
 	locales: {
 		'/': {
 			title: 'blog',
-			description: '记录这一路走来'
+			description: '不积硅步无以至千里'
 		}
 	},
 	serviceWorker: true,
@@ -63,17 +61,24 @@ module.exports = {
                         'HTML',
 						'CSS',
                         'JS',
-						'ES6',
-						'数组操作',
+                      'ES6',
+                      '数组操作',
                         // 'items',
                         // 'exam'
                     ],
                     '/webImprove/': [
                         '',
                         '缓存',
+                        'JS执行机制',
+                        '防抖节流'
                     ],
-                    '/webpack/':[],
-                    '/vue/': [],
+                    '/webpack/':[
+                        ''
+                    ],
+                    '/vue/': [
+                        '',
+                        'vue源码分析'
+                    ],
                     '/react/': [],
                     '/node/': [],
                     // '/items/': [

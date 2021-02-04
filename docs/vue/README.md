@@ -1,4 +1,4 @@
-# vue
+# vue基础
 
 ##  1.Vue.js是什么
 Vue.js（是一套构建用户界面的 渐进式框架。与其他重量级框架不同的是，Vue 采用自底向上增量开发的设计。Vue 的核心库只关注视图层，并且非常容易学习，非常容易与其它库或已有项目整合。另一方面，Vue 完全有能力驱动采用单文件组件和Vue生态系统支持的库开发的复杂单页应用。Vue.js 的目标是通过尽可能简单的 API 实现响应的数据绑定和组合的视图组件
@@ -145,7 +145,7 @@ action 可以包含任意异步操作
 一个组件的 data 选项必须是一个函数，因此每个实例可以维护一份被返回对象的独立的拷贝：
 返回一个唯一的对象，不要和其他组件共用一个对象进行返回!!!每一个实例的data属性都是独立的；
 
-### 19.axios封装
+## 19.axios封装
 1.设置axios默认baseURL axios.defaults.baseURL
 2.设置axios默认请求数据类型  axios.defaults.headers.common["Accept"] = "application/json"
 #### 请求拦截
@@ -165,147 +165,35 @@ action 可以包含任意异步操作
 3 公共方法permission.js处理这个权限对象
 4 在路由中meta设置auth. 公共侧边栏利用this.permission(meta.auth)控制页面权限
 
-## Virtual Dom 的优势在哪里？
+## 20.Virtual Dom 的优势在哪里？
 > DOM 引擎、JS 引擎 相互独立，但又工作在同一线程（主线程）JS 代码调用 DOM API 必须 挂起 JS 引擎、转换传入参数数据、激活 DOM 引擎,引擎间切换的单位代价将迅速积累若其中有强制重绘的 DOM API 调用，重新计算布局、重新绘制图像会引起更大的性能消耗.
 - 1.虚拟 DOM 不会立马进行排版与重绘操作
 - 2.虚拟 DOM 进行频繁修改，然后一次性比较并修改真实 DOM 中需要改的部分，最后在真实 DOM 中进行排版与重绘，减少过多DOM节点排版与重绘损耗
 - 3.虚拟 DOM 有效降低大面积真实 DOM 的重绘与排版，因为最终与真实 DOM 比较差异，可以只渲染局部
 
-## 单页应用有那些优缺点？
+## 21.单页应用有那些优缺点？
 优点：对服务器请求较少，减轻了服务器的压力，只需要一次加载，页面片段之间切换快，用户体验良好
 缺点：第一次加载时耗费时间较长，不利于SEO
 
-## common.js 和 es6 中模块引入的区别？
+## 22.common.js 和 es6 中模块引入的区别？
 - 1.CommonJS 模块输出的是一个值的拷贝，ES6 模块输出的是值的引用。
 - 2.CommonJS 模块是运行时加载，ES6 模块是编译时输出接口。
 - 3.CommonJs 是单个值导出，ES6 Module可以导出多个
 
-## vue3今年发布了，请你说一下他们之间在相应式的实现上有什么区别？Proxy 相比于 defineProperty 的优势 
+## 23.vue3今年发布了，请你说一下他们之间在相应式的实现上有什么区别？Proxy 相比于 defineProperty 的优势 
 vue2采用的是defineProperty去定义get，set，而vue3改用了proxy.
 
-#### Proxy的优势
+#### 24.Proxy的优势
 - 1.可以直接监听对象而非属性
 - 2.可以直接监听数组的变化
 - 3.Proxy返回一个新对象，可以只操作新对象达到目的，而Object.defineProperty只能遍历对象属性直接修改
 
-## 像vue-router，vuex他们都是作为vue插件，请说一下他们分别都是如何在vue中生效的？
+## 25.像vue-router，vuex他们都是作为vue插件，请说一下他们分别都是如何在vue中生效的？
 通过vue的插件系统，用vue.mixin混入到全局，在每个组件的生命周期的某个阶段注入组件实例
 
-## 请你说一下vue的设计架构
+## 26.请你说一下vue的设计架构
 vue2采用的是典型的混入式架构，各部分分模块开发，再通过一个mixin去混入到最终暴露到全局的类上
 
 
-
-## 从源码分析
-::: tip 
-  将回答问题的方式、思路和层次提升一个层级
-:::
-
-### 1.v-if和v-for哪个优先级更高？同时出现 如何优化？
-> 源码 compiler/condegen/index.js
-
-#### 结论
-- 1.显然v-for的优先级高于v-if (codegenindex源码中顺序为el.once > el.for < el.if)
-- 2.如果同时出现，每次渲染都会先执行循环在判断，循环不可避免，浪费性能
-- 3.将v-if提到外面一层，内部进行v-for循环
-
-### 2.Vue组件data为什么必须是个函数而Vue的根实例没有这个限制？
-> 源码 src/core/instance/state.js - initData()
-
-#### 结论
-- Vue组件可能存在多个实例，如果使用对象形式定义data,他们将会公用一个data对象，状态改变将会
-影响多个组件实例;采用函数定义，在initData时会返回一个全新的data对象，避免多实例的状态污染。
-Vue跟实例不会出现这个问题，是因为根实例只能有一个。
-
-### 3.Vue中的key的作用和工作原理？
-> 源码 src/core/vdom/patch.js - updateChildren()
-
-#### 结论
-- 1.key的主要作用是为了更高效的更新虚拟Dom,其原理是vue在patch过程中通过key可以精准的判断两个节点
-是否是同一个，避免频繁更新不同的元素，会让整个patch过程更加高效，减少dom操作，提高性能。
-- 2.若不设置key还可能在列表更新引发一些隐藏的bug
-
-### 4.怎么理解vue中的diff算法？
-> 源码分析1：必要性 lifecycle.js - mountConponent()
-组件中可能存在很多个data中的key使用
-> 源码分析2：执行方法 patch.js- patchVnode()
-patchVnode是diff发生的地方 整体策略:深度优先，同级比较
-> 源码分析3：高效性 patch.js -updateChildren()
- 
-#### 结论
-- 1.diff算法是虚拟DOM的必然产物：通过新旧虚拟DOM作对比，将变化的地方更新在真实的DOM上，
-另外，也需要diff高效的执行对比过程。
-- 2.vue 2.x中为了降低Watcher粒度，每个组件只有一个watcher与之对应，只有引入diff才能精确找到
-变化的地方。
-- 3.vue中diff执行的时刻是组件实例执行其更新函数时，它会对比上一次渲染结果的oldVnode和新的渲染结果
-newVnode,此过程称为patch。
-
-### 5.Vue组件化的理解？
-> 组件化定义，优点，使用场景和注意事项。
-> 源码分析1：组件定义 src/core/global-api/assets.js
-vue-loader会编译template为render函数，最终导出的依然是组件配置对象。
-> 源码分析2：组件化优点 lifecycle.js = mountComponent()
-组件、watcher、渲染函数和更新函数之间的关系
-> 源码分析3：组件化实现 src/code/global-api/extend.js
-实例化及挂载，src/core/vdom/patch.js - createElm()
- 
-#### 结论
-- 1.组件化是软件工程中的一种思想，组件是独立和可复用的代码单元。组件是vue核心特性之一。
-- 2.组件化开发能大幅度提高效率，测试性，复用性。
-- 3.组件按分类有：页面组件，业务组件，通用组件。
-- 4.vue的组件是基于配置的，我们通常编写的组件是组件配置而非组件，框架后续会生成其构造函数，
-他们是基于vueComponent,拓展于Vue；
-- 5.vue中常见的组件化：属性prop,自定义事件，插槽。
-- 6.组件应该是高内聚，低耦合的。
-- 7.遵循单向数据流的原则。
-
-### 6.谈一谈vue设计原则？
-- 1.渐进式js框架
-- 2.易用 灵活 高效
-
-
-### 7.你了解哪些Vue的性能优化方法(代码层面)？
-- 1.路由懒加载
-```js
-component : ()=>import("./xx.vue")
-
-```
-- 2.keep-alive 缓存页面
-```js
- <keep-alive include="getProcess">
-        <router-view></router-view>
-</keep-alive>
-```
-- 3.使用v-show复用dom
-- 4.v-for 遍历避免同时使用v-if
-- 5.长列表性能优化
-  - 如果列表是纯粹的数据展示，Object,freeze()冻结
-  - 如果是大数据长列表 可采用虚拟滚动。 vue-virtual-scroller
-- 6.图片懒加载
-- 7.第三方插件按需引入  
-- 8.无状态的组件标记为函数式组件
-```js
-<template functional>
-    <div class="tab">
-         <div v-if="props.value"></div>
-    </div>
-</template>    
-<script>
-export default {
-    props:['value']
-}
-</script>
-```
-
-### 8.对3.0的新特性有没有了解？
-- 更快
-  - 虚拟DOM重写
-  - 优化slots的生成
-  - 静态属性提升
-  - 基于proxy的响应式系统
-- 更小：优化核心库体积
-- 更易维护：Ts+模块化
-- 更加优化
-- 更容易使用
 
 

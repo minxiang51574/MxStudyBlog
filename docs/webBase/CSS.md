@@ -15,8 +15,8 @@
 ### box-sizing 的使用
 
 box-sizing 的默认属性是 content-box  
-box-sizing: content-box 是 W3C 盒子模型  
-box-sizing: border-box 是 IE 盒子模型 (个人习惯会常用)
+box-sizing: content-box 是 W3C 标准盒模型  
+box-sizing: border-box 是 IE 盒模型
 
 ## 2.居中布局
 
@@ -39,7 +39,7 @@ box-sizing: border-box 是 IE 盒子模型 (个人习惯会常用)
   1. `absolute + transform`
   2. `flex + justify-content + align-items`
 
-## 3.左侧固定，右边自适应
+## 3.左侧固定，右边自适应(推荐4/5)
 
 ```css
 //方法1  浮动布局
@@ -92,22 +92,8 @@ box-sizing: border-box 是 IE 盒子模型 (个人习惯会常用)
            flex: 1;
            background-color: #000000;
         }
-//方法5  table 
-        section{
-            display:table;
-            width: 100%;
-        }
-        .left{
-            display:table-cell;
-            width: 200px;
-            background-color: bisque;
-        }
-        .right{
-            display:table-cell;
-            background-color: #000000;
-        }
 
-//方法6  grid 网格布局 
+//方法5  grid 网格布局 
 section{
 
              display: grid;
@@ -121,7 +107,7 @@ section{
 - **!important > 行内样式 > #id > .class > tag > \* > 继承 > 默认**
 - **选择器 从右往左 解析**
 
-## 5清除浮动
+## 5.清除浮动
 
 #### 去除浮动影响，防止父级高度塌陷
 
@@ -143,7 +129,7 @@ section{
       zoom:1
   }
   ```
-### 6.三角形
+## 6.三角形
 
 设置边框的宽度与颜色
 ```
@@ -232,3 +218,58 @@ section{
   - animation-delay: 延迟
   - animation-iteration-count: 次数 ——infinite: 循环动画
   - animation-direction: 方向 ——alternate: 反向播放
+
+## 8.css控制文本内容显示省略号
+### 1，单行文字显示省略号
+```css
+div{
+　　width:200px;
+　　overflow:hidden;
+　　white-space:nowrap;
+　　text-overflow:ellipsis;
+}
+```
+### 2，多行文字显示省略号
+```css
+div{
+　　width:200px;
+　　overflow:hidden;
+　　text-overflow:ellipsis;
+　　display:-webkit-box;//将对象作为弹性伸缩盒子模型显示
+　　-webkit-line-clamp:2;//控制显示几行文字
+　　-webkit-box-orient:vertical;//设置伸缩盒对象的子元素排列方式
+}
+如果你标签内的是英文，英文是不会自动换行的，所以你需要让英文自动换行,添加一下代码
+word-wrap:break-word;
+word-break:break-all;
+```
+
+
+## 9.flex布局
+
+#### 容器属性
+ - flex-direction  属性决定主轴的方向（即项目的排列方向）
+ - flex-wrap  换行 默认情况下，项目都排在一条线（又称"轴线"）上
+ - flex-flow  属性是flex-direction属性和flex-wrap属性的简写形式，默认值为row nowrap
+ - justify-content 属性定义了项目在主轴上的对齐方式
+    - flex-start（默认值）：左对齐
+    - flex-end：右对齐
+    - center： 居中
+    - space-between：两端对齐，项目之间的间隔都相等。
+    - space-around：每个项目两侧的间隔相等。
+ - align-items
+    - flex-start：交叉轴的起点对齐。
+    - flex-end：交叉轴的终点对齐。
+    - center：交叉轴的中点对齐。
+    - baseline: 项目的第一行文字的基线对齐。
+    - stretch（默认值）：如果项目未设置高度或设为auto，将占满整个容器的高度。
+ - align-content
+
+
+#### 项目属性
+- order  属性定义项目的排列顺序。数值越小，排列越靠前，默认为0
+- flex-grow 属性定义项目的放大比例，默认为0，即如果存在剩余空间，也不放大 
+- flex-shrink 属性定义了项目的缩小比例，默认为1，即如果空间不足，该项目将缩小
+- flex-basis 属性定义了在分配多余空间之前，项目占据的主轴空间
+- flex
+- align-self  align-self属性允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性
