@@ -53,6 +53,14 @@ module.exports = {
                         text: 'node',
                         link: '/node/'
                     },
+                    {
+                        text: '大厂真题',
+                        link: '/test/'
+                    },
+                    {
+                        text: 'TypeScript',
+                        link: '/typeScript/'
+                    }
                     // {
                     //     text: '项目',
                     //     link: '/items/'
@@ -87,6 +95,7 @@ module.exports = {
                     ],
                     '/react/': [],
                     '/node/': [],
+                    '/test/': [],
 				}
 			}
 		}

@@ -1,6 +1,6 @@
 # CSS
 
-## 1.盒子模型
+## 1、盒子模型
 
 - **content-box (W3C 标准盒模型)**
   ::: tip 在标准的盒子模型中
@@ -129,10 +129,10 @@ section{
       zoom:1
   }
   ```
-## 6.三角形
+## 6、三角形
 
 设置边框的宽度与颜色
-```
+```js
  .box{
 	width:0px;
 	height:0px;
@@ -271,5 +271,5 @@ word-break:break-all;
 - flex-grow 属性定义项目的放大比例，默认为0，即如果存在剩余空间，也不放大 
 - flex-shrink 属性定义了项目的缩小比例，默认为1，即如果空间不足，该项目将缩小
 - flex-basis 属性定义了在分配多余空间之前，项目占据的主轴空间
-- flex
+- flex flex-grow、flex-shrink、flex-basis的简写
 - align-self  align-self属性允许单个项目有与其他项目不一样的对齐方式，可覆盖align-items属性
