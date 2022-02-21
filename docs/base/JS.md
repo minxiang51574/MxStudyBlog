@@ -766,9 +766,8 @@ example(fn); // 我是主函数 我是回调函数
 
 ## Promise
 
-### 谈一下 Promise?
-
-Primise 是 ES6 出的异步编程的一种解决方案。携带两个参数分别是 resolve 和 reject。
+**Promise**是ES6推出的异步编程的一种解决方案。**解决了回调地狱问题，提高了代码的可读性,状态不可逆**，一旦改变则不会再变了；
+常用的方法有resolve、reject、then、catch、race、all、allSettled、any、finally。then()方法会返回一个新的Promise实例，所以能够连续then
 
 ```js
 //实例
@@ -801,6 +800,9 @@ runAsyns()
 ```
 
 ### async await
+
+async/await:是用同步的方式执行异步的操作，generator+Promise的语法糖;它的实现原理，利用Promise嵌套，再加上generator函数的步骤控制，实现了按顺序执行异步操作的效果；
+> async函数返回的是一个Promise,正常情况下，await命令后面是一个 Promise 对象，返回该对象的结果。如果不是 Promise 对象，就直接返回对应的值。
 ```js 
    //先看一段代码
    //单一的 Promise 链并不能发现 async/await 的优势，但是，如果需要处理由多个 Promise 组成的 then 链的时候，优势就能体现出来了（很有意思，Promise 通过 then 链来解决多层回调的问题，现在又用 async/await 来进一步优化它）。
