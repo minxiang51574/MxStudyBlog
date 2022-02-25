@@ -42,8 +42,12 @@ module.exports = {
                         link:'/write/',
                     },
                     {
-                        text:'vue',
+                        text:'Vue',
                         link:'/vue/'
+                    },
+                    {
+                        text:'Vue基础',
+                        link:'/vueBase/'
                     },
                     {
                         text: 'react',
@@ -86,10 +90,14 @@ module.exports = {
                     '/webpack/':[
                         ''
                     ],
-                    '/write/':[
+                    '/write/':[ 
                         ''
                     ],
                     '/vue/': [
+                        '',
+                        'vue3'
+                    ],
+                    '/vueBase/': [
                         '',
                         'vue源码分析'
                     ],
