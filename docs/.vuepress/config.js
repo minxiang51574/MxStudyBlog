@@ -30,7 +30,7 @@ module.exports = {
                         link: "/base/"
                     },
                     {
-                        text: '前端进阶',
+                        text: '进阶',
                         link: "/webImprove/"
                     },
                     {
@@ -50,11 +50,15 @@ module.exports = {
                         link:'/vueBase/'
                     },
                     {
-                        text: 'react',
-                        link: '/react/'
+                        text:'React',
+                        link:'/react/'
                     },
                     {
-                        text: 'node',
+                        text: 'React基础',
+                        link: '/reactBase/'
+                    },
+                    {
+                        text: 'Node',
                         link: '/node/'
                     },
                     {
@@ -78,11 +82,11 @@ module.exports = {
 						'CSS',
                         'JS',
                         'ES6',
-                        '数组操作',
+                        '数组',
                         'exam'
                     ],
                     '/webImprove/': [
-                        '',
+                        // '',
                         '缓存',
                         'JS执行机制',
                         '防抖节流'
@@ -101,7 +105,12 @@ module.exports = {
                         '',
                         'vue源码分析'
                     ],
-                    '/react/': [],
+                    '/react/': [
+                        '',
+                    ],
+                    '/reactBase/': [
+                        ''
+                    ],
                     '/node/': [],
                     '/test/': [],
 				}

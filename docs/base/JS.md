@@ -2,7 +2,7 @@
 
 [深入理解 javascript 原型和闭包系列](https://dojay.cn/fe/yuanxing.html) 。
 
-## 数据类型及区别
+## 1、数据类型及区别
 
 基本类型： number string boolean null undefined symbol bigint
 
@@ -70,7 +70,7 @@ Object.prototype.toString.call() 常用于判断浏览器内置对象时。
   - parseFloat()
   - Number()
 
-## 原型 && 原型链
+## 2、原型 && 原型链
 
 ![原型](../proto.png)
 ![原型](../proto2.jpg)
@@ -97,7 +97,7 @@ Object.prototype.__proto__ === null // true
 
 ```
 
-## this
+## 3、this指向
 
 ### JS 中 this 的五种情况
 - 1.作为普通函数执行时，this指向window。
@@ -225,7 +225,7 @@ var obj = {
 console.log(obj.getAge()); //张三
 ```
 
-## new
+## 4、new
 
 ### 通过 new 创建对象经历 4 个步骤：
 
@@ -244,7 +244,7 @@ function _new(fn, ...arg) {
 
 ```
 
-## call apply bind
+## 5、call apply bind
 
 ### 概念：
 
@@ -315,9 +315,10 @@ const dog = {
 
 ```
 
-#### 拓展
+### 拓展
 `实现一个call函数`
 ```js
+ // 原理：利用 context.xxx = self obj.xx = func-->obj.xx()
  Function.prototype.myCall = function (obj) {
                 obj = obj || window
                 obj.fn = this
@@ -325,7 +326,18 @@ const dog = {
                 let result = obj.fn(...arg)
                 delete obj.fn
                 return result
- }           
+ } 
+
+Function.prototype.myCall = function(context = window, ...args) {
+  // 在context上加一个唯一值不影响context上的属性
+  let key = Symbol('key')
+  context[key] = this; // context为调用的上下文,this此处为函数，将这个函数作为context的方法
+  // let args = [...arguments].slice(1)   //第一个参数为obj所以删除,伪数组转为数组
+  let result = context[key](...args);
+  delete context[key]; // 不删除会导致context属性越来越多
+  return result;
+};
+ 
 ```
 
 `实现一个apply函数`
@@ -336,6 +348,14 @@ const dog = {
                     let result = arguments[1] ? obj.fn(...arguments[1]): obj.fn()
                     delete obj.fn;
                     return result;
+}
+Function.prototype.myApply = function(context = window, ...args) {
+  let key = Symbol('key')
+  context[key] = this; // context为调用的上下文,this此处为函数，将这个函数作为context的方法
+  // let args = [...arguments[1]]   //第一个参数为obj所以删除,伪数组转为数组
+  let result = context[key](args); // 这里和call传参不一样
+  delete context[key]; // 不删除会导致context属性越来越多
+  return result;
 }
 
 ```
@@ -353,6 +373,16 @@ Function.prototype.myBind = function (obj) {
         //arg = arg.concat(Array.prototype.slice.call(arguments))
         return result.apply(obj, arg)
     }
+}
+
+Function.prototype.myBind = function (context, ...outerArgs) {
+  // this->func context->obj outerArgs->[10,20]
+  let self = this
+  // 返回一个函数
+  return function F(...innerArgs) { //返回了一个函数，...innerArgs为实际调用时传入的参数
+    // 把func执行，并且改变this即可
+    return self.apply(context, [...outerArgs, ...innerArgs]) //返回改变了this的函数，参数合并
+  }
 }
 ```
 
@@ -377,7 +407,7 @@ Function.prototype.myBind = function (obj) {
 ```
 
 
-## 闭包
+## 6、闭包
 
 #### 闭包就是能够读取其他函数内部变量的函数。 本质上，闭包是将函数内部和函数外部连接起来的桥梁
 - 创建闭包的最常见的方式就是在一个函数内创建另一个函数，通过另一个函数访问这个函数的局部变量,利用闭包可以突破作用链域
@@ -407,7 +437,7 @@ f1();
 - 1.由于闭包会使得函数中的变量都被保存在内存中，内存消耗很大，所以不能滥用闭包，否则会造成网页的性能问题，在IE中可能导致内存泄露。解决方法是，在退出函数之前，将不使用的局部变量全部删除。
 - 2.闭包会在父函数外部，改变父函数内部变量的值。所以，如果你把父函数当作对象（object）使用，把闭包当作它的公用方法（Public Method），把内部变量当作它的私有属性（private value），这时一定要小心，不要随便改变父函数内部变量的值。
 
-#### 应用
+### 应用
 ```js
    for (let i = 0; i < 5; i++) {
          (function (i) {  // j = i
@@ -417,7 +447,7 @@ f1();
         })(i);
     }
 ```
-## 函数柯里化
+### 函数柯里化
 ```js
 function add(a) {
             function sum(b) { // 使用闭包
@@ -464,10 +494,9 @@ add(1)(2)(3)(4)(5)          // 15
 add(2, 6)(1)                // 9
 ```
 
-## 继承
+## 7、继承
 
-
-#### 必问 要求能手写几种继承
+### 手写几种继承
 
 ```js
 //https://juejin.im/post/5c1f9fc0f265da6125781973utm_medium=hao.caibaojian.com&utm_source=hao.caibaojian.com
@@ -573,7 +602,7 @@ console.log(a4.drink()); //张三,性别女,19岁了,在喝东西
 
 ```
 
-## 深浅拷贝
+## 8、深浅拷贝
 
 ```js
 let a = {
@@ -589,7 +618,7 @@ console.log(a.age); //2
 
 ### 浅拷贝
 
-#### 浅拷贝只复制引用，而未复制真正的值
+### 浅拷贝只复制引用，而未复制真正的值
 
 - 1 通过 Object.assign 来解决这个问题
 
@@ -613,7 +642,7 @@ b.age = 2;
 console.log(a.age); // 1
 ```
 
-#### 通常浅拷贝就能解决大部分问题了，但是当我们遇到如下情况就需要使用到深拷贝了。
+### 通常浅拷贝就能解决大部分问题了，但是当我们遇到如下情况就需要使用到深拷贝了。
 
 ```js
 let a = {
@@ -678,7 +707,7 @@ function deepClone(source){
 
 ```
 
-## 事件委托 事件冒泡
+## 9、事件委托、冒泡
 
 1.基本概念？
 捕获：自顶向下
@@ -733,7 +762,7 @@ window.addEventLister('click',function(e){
 ```
 
 
-### 递归、回调
+### 9、递归、回调
 
 #### 递归函数：如果一个函数在其主体中直接或间接调用其本身(自己调用自己)，则这样的函数则称为"递归函数"
 
@@ -745,10 +774,20 @@ function fn1(num) {
   return num * fn1(num - 1);
 }
 console.log(fn1(5)); //120
+
+
+//递归求0-100之后
+function calc(number) {       
+    if (number === 1) {  
+      return 1;         
+    }
+    return number + calc(number - 1); 
+ }
+
 ```
 
 
-#### 回调函数:一段可执行的代码段，它作为一个参数传递给其他的代码(函数当做参数传递)，其作用是在需要的时候方便调用这段（回调函数）代码
+### 回调函数:一段可执行的代码段，它作为一个参数传递给其他的代码(函数当做参数传递)，其作用是在需要的时候方便调用这段（回调函数）代码
 
 ```js
 function example(callback) {
@@ -763,97 +802,8 @@ function fn() {
 }
 example(fn); // 我是主函数 我是回调函数
 ```
-
-## Promise
-
-**Promise**是ES6推出的异步编程的一种解决方案。**解决了回调地狱问题，提高了代码的可读性,状态不可逆**，一旦改变则不会再变了；
-常用的方法有resolve、reject、then、catch、race、all、allSettled、any、finally。then()方法会返回一个新的Promise实例，所以能够连续then
-
-```js
-//实例
-function runAsyns() {
-  var p = new Promise(function(resolve, reject) {
-    //做一些异步操作
-    setTimeout(function() {
-      resolve("数据1");
-    }, 2000);
-  });
-  return p;
-}
-
-runAsyns()
-  .then(val => {
-    console.log(val); // 数据1
-    return new Promise(function(resolve, reject) {
-      resolve("数据2");
-    });
-  })
-  .then(val => {
-    console.log(val); // 数据2
-    return new Promise((resolve, reject) => {
-      resolve("数据3");
-    });
-  })
-  .then(val => {
-    console.log(val); // 数据3
-  });
-```
-
-### async await
-
-async/await:是用同步的方式执行异步的操作，generator+Promise的语法糖;它的实现原理，利用Promise嵌套，再加上generator函数的步骤控制，实现了按顺序执行异步操作的效果；
-> async函数返回的是一个Promise,正常情况下，await命令后面是一个 Promise 对象，返回该对象的结果。如果不是 Promise 对象，就直接返回对应的值。
-```js 
-   //先看一段代码
-   //单一的 Promise 链并不能发现 async/await 的优势，但是，如果需要处理由多个 Promise 组成的 then 链的时候，优势就能体现出来了（很有意思，Promise 通过 then 链来解决多层回调的问题，现在又用 async/await 来进一步优化它）。
-  function takeTime(n){
-        return new Promise((resolve,reject)=>{
-            setTimeout(() => {
-                resolve( (n+200),n)
-            }, 1000);
-        })
-    }
-    function step1(n) {
-            console.log(`step1 with ${n}`);
-            return takeTime(n);
-        }
-
-        function step2(n) {
-            console.log(`step2 with ${n}`);
-            return takeTime(n);
-        }
-
-        function step3(n) {
-            console.log(`step3 with ${n}`);
-            return takeTime(n);
-      }
-        function step3(n) {
-            console.log(`step3 with ${n}`);
-            return takeTime(n);
-      }
-      function doIt(){
-         console.time("doIt");
-         const time1 = 300;
-         step1(time1)
-         .then(v => step2(v))
-         .then(v => step3(v))
-         .then(result=>{
-             console.log(result,'end')
-         })
-      }
-     doIt()
-
-     async function doIt2(){
-         console.time("doIt2");
-         const time1 = 300;
-         const time2 = await step1(time1);
-         const time3 = await step2(time2);
-         const result = await step3(time3);
-         console.log(result, 'end')
-     }
-    doIt2()
-```
-## 防抖
+## 10、防抖、节流
+### 防抖
 > 触发高频事件后n秒内函数只会执行一次，如果n秒内高频事件再次被触发，则重新计算时间
 > 思路：每次触发事件时都取消之前的延时调用方法
 > 应用：
@@ -878,7 +828,7 @@ var inp = document.getElementById('inp');
 inp.addEventListener('input', debounce(sayHi)); // 防抖
 ```
 
-## 节流
+### 节流
 > 高频事件触发，但在n秒内只会执行一次，所以节流会稀释函数的执行频率
 > 思路：每次触发事件时都判断当前是否有等待执行的延时函数
 > 应用：

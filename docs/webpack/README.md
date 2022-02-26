@@ -1,12 +1,12 @@
 # webpack
  
-## 1.概念
+## 1、概念
 webpack是一个模块打包工具，可以使用它管理项目中的模块依赖，并编译输出模块所需的静态文件。它可以很好地管理、打包开发中所用到的HTML,CSS,JavaScript和静态文件（图片，字体）等，让开发更高效。对于不同类型的依赖，webpack有对应的模块加载器，而且会分析模块间的依赖关系，最后合并生成优化的静态资源。
 
-## 2.打包原理
+## 2、打包原理
 webpack是收把项目当作一个整体，通过一个给定的的主文件，webpack将从这个文件开始找到你的项目的所有依赖文件，使用loaders处理它们，将所有依赖打包成一个bundle.js，通过代码分割成单元片段按需加载。
 
-## 3.webpack的基本功能和工作原理？
+## 3、webpack的基本功能和工作原理？
 - 代码转换：TypeScript 编译成 JavaScript、SCSS 编译成 CSS 等等
 - 文件优化：压缩 JavaScript、CSS、HTML 代码，压缩合并图片等
 - 代码分割：提取多个页面的公共代码、提取首屏不需要执行部分的代码让其异步加载
@@ -14,7 +14,7 @@ webpack是收把项目当作一个整体，通过一个给定的的主文件，w
 - 自动刷新：监听本地源代码的变化，自动构建，刷新浏览器
 - 自动发布：更新完代码后，自动构建出线上发布代码并传输给发布系统
 
-## 4.webpack构建流程
+## 4、webpack构建流程
 - 1.初始化参数：从配置文件和 Shell 语句中读取与合并参数，得出最终的参数；
 - 2.开始编译：用上一步得到的参数初始化 Compiler 对象，加载所有配置的插件，执行对象的 run 方法开始执行编译；
 - 3.确定入口：根据配置中的 entry 找出所有的入口文件；
@@ -23,22 +23,21 @@ webpack是收把项目当作一个整体，通过一个给定的的主文件，w
 - 6.输出资源：根据入口和模块之间的依赖关系，组装成一个个包含多个模块的 Chunk，再把每个 Chunk 转换成一个单独的文件加入到输出列表，这步是可以修改输出内容的最后机会；
 - 7.输出完成：在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统。
   
-## 5有哪些常见的Loader？他们是解决什么问题的？  
+## 5、有哪些常见的Loader？他们是解决什么问题的？  
 > loader实现对不同格式文件的处理;Loader的作用是让webpack拥有了加载和解析非JavaScript文件的能力
 - 1.babel-loader 用babel来转换ES6文件到ES5
 - 2.less-loader 处理less sass-loader 处理sass
 - 3.css-loader,style-loader：解析css文件，能够解释@import url()等
 - 4.url-loader：打包图片
 
-## 6.有哪些常见的Plugin？他们是解决什么问题的？ 
+## 6、有哪些常见的Plugin？他们是解决什么问题的？ 
 > Plugin直译为"插件",Plugin可以扩展webpack的功能，让webpack具有更多的灵活性
 - 1.commons-chunk-plugin：提取公共代码
 - 2.uglifyjs-webpack-plugin：压缩js
 - 3.optimize-css-assets-webpack-plugin:压缩css
 - 4.extract-text-webpack-plugin该插件的主要是为了抽离css样式
 
-## 7.webpack优化（重点）
-
+## 7、webpack优化（重点）
 ### A.构建速度
 - 1. 缩小文件的搜索范围  
   resolve字段告诉webpack怎么去搜索文件
@@ -315,7 +314,7 @@ module.exports = {
 ```
 
 
-## 8.webpack编写一个插件plugins
+## 8、webpack编写一个插件plugins
 ```js
 //loader是一个函数，插件是一个类
 class CopyrightWebpackPlugin {
@@ -356,7 +355,7 @@ class CopyrightWebpackPlugin {
 module.exports = CopyrightWebpackPlugin;
 ```
 
-## 9.webpack编写一个插件loader
+## 9、webpack编写一个插件loader
 ```js
    // webpack.config.js
       module.exports = {
@@ -389,7 +388,7 @@ module.exports = CopyrightWebpackPlugin;
 
 ```
 
-## 10.webpack与gulp区别
+## 10、webpack与gulp区别
 前端开发和其他开发工作的主要区别，首先是前端是基于多语言、多层次的编码和组织工作，其次前端产品的交付是基于浏览器，这些资源是通过增量加载的方式运行到浏览器端，如何在开发环境组织好这些碎片化的代码和资源，并且保证他们在浏览器端快速、优雅的加载和更新，就需要一个模块化系统，这个理想中的模块化系统是前端工程师多年来一直探索的难题
 
 ### Gulp

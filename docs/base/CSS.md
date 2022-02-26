@@ -18,7 +18,7 @@ box-sizing 的默认属性是 content-box
 box-sizing: content-box 是 W3C 标准盒模型  
 box-sizing: border-box 是 IE 盒模型
 
-## 2.居中布局
+## 2、居中布局
 
 - **水平居中**:
 
@@ -39,7 +39,7 @@ box-sizing: border-box 是 IE 盒模型
   1. `absolute + transform`
   2. `flex + justify-content + align-items`
 
-## 3.左侧固定，右边自适应(推荐4/5)
+## 3、左侧固定，右边自适应(推荐4/5)
 
 ```css
 //方法1  浮动布局
@@ -102,12 +102,12 @@ section{
         }
 
 ```
-## 4.选择器优先级
+## 4、选择器优先级
 
 - **!important > 行内样式 > #id > .class > tag > \* > 继承 > 默认**
 - **选择器 从右往左 解析**
 
-## 5.清除浮动
+## 5、清除浮动
 
 #### 去除浮动影响，防止父级高度塌陷
 
@@ -159,7 +159,7 @@ section{
 
 ```
 
-## 7.H5C3
+## 7、H5C3
 
 ### H5 新增
 
@@ -219,7 +219,7 @@ section{
   - animation-iteration-count: 次数 ——infinite: 循环动画
   - animation-direction: 方向 ——alternate: 反向播放
 
-## 8.css控制文本内容显示省略号
+## 8、css控制文本内容显示省略号
 ### 1，单行文字显示省略号
 ```css
 div{
@@ -245,7 +245,7 @@ word-break:break-all;
 ```
 
 
-## 9.flex布局
+## 9、flex布局
 
 #### 容器属性
  - flex-direction  属性决定主轴的方向（即项目的排列方向）

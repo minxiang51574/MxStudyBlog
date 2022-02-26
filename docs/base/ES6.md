@@ -1,9 +1,8 @@
 # ES6
-:::  warning 这里只归档常用的
-详情文档 [阮一峰ECMAScript 6 入门](http://es6.ruanyifeng.com/#docs/let)
-:::
 
-## 变量声明
+详情文档 [阮一峰ECMAScript 6 入门](http://es6.ruanyifeng.com/#docs)
+
+## 1、变量声明
 ### 用let不用var
 经典面试题
 ```js
@@ -41,7 +40,7 @@ for (let i = 0; i < 5; i++) {
 ### const
 const一旦声明不可以被更改 常用来声明全局变量
 
-## 箭头函数
+## 2、箭头函数
 
 ### 箭头函数和普通函数的区别？
 - 1.改变this的指向，会捕获其所在的上下文的this值，作为自己的this值
@@ -54,103 +53,174 @@ const一旦声明不可以被更改 常用来声明全局变量
 - 2.定义原型方式时
 - 3.构造函数 
 
-## 字符串拼接
-
+## 3、模板字符串、解构赋值、剩余参数
 ```js
+//模板字符串
 //before
 const a = "html";
 const b = 'css' + a + 'js';
 //now
 const a = 'html';
 const b = `css${a}js`;
-
 ```
-## 解构
+
 ```js
+//解构赋值
 let arr = ['a', 'b', 'c', 'd'];
 console.log(...arr) //a b c d
- ```
-```js
-const arr = ['a', 'b', 'c', 'd'];
 
 // before
 const first = arr[0];
 const second = arr[1];
-
 // now
 const [first, second] = arr;
-```
-```js
+
 // before
 function getName(user) {
   const first = user.first;
   const last = user.last;
 }
-
 // now
 function getName({ first, last }) {
 }
+let { num:num2 } = { num1 : 1}
+// num2 : 1
+
+//剩余参数
+function rest(num,...rest){
+    console.log(rest) //[2, 3, 4]
+}
+rest(1,2,3,4)
 ```
 
+## 4、Set、Map
 
-### map 遍历 映射
+### Set
 ```js
-使用频率非常高 返回一个数组对象 我们要拿到数组所有的name
- let data = [
-        {name: "科比", "age": "30",id:1},
-        {name: "王治郅",  "age": "29",id:2},
-        {name: "姚明", "age": "28",id:3}
-    ];
- let nameList = data.map(item =>item.name)  // ["科比", "王治郅", "姚明"]
-
- reduce实现map功能
- let nameList2 = data.reduce((prev,cur)=>{
-        prev.push(cur.name)
-        return prev 
-    },[])
+const set = new Set([1, 2, 3, 4, 4]);
+[...set]
+// [1, 2, 3, 4]
 ```
-### filter 过滤
+#### 常用方法
+> add、delete、has、clear
+
+#### WeakSet 
+- WeakSet 的成员只能是对象
+- WeakSet 中的对象都是弱引用，即垃圾回收机制不考虑 WeakSet 对该对象的引用
+
+### Map
+```js
+const map = new Map([
+  ['name', '张三'],
+  ['title', 'Author']
+]);
+
+map.size // 2
+map.has('name') // true
+map.get('name') // "张三"
+map.has('title') // true
+map.get('title') // "Author"
+```
+
+#### 常用方法
+> set、get、delete、has、clear
+
+#### WeakSet 
+- WeakMap只接受对象作为键名
+- WeakMap的键名所指向的对象，不计入垃圾回收机制
+## 5、Promise
+
+**Promise**是ES6推出的异步编程的一种解决方案。**解决了回调地狱问题，提高了代码的可读性,状态不可逆**，一旦改变则不会再变了；
+常用的方法有resolve、reject、then、catch、race、all、allSettled、any、finally。then()方法会返回一个新的Promise实例，所以能够连续then
 
 ```js
-使用频率同样非常高 返回一个数组对象 我们需要过滤掉数组中特定的项 如年龄>=29
- let data = [
-        {name: "科比", "age": "30",id:1},
-        {name: "王治郅",  "age": "29",id:2},
-        {name: "姚明", "age": "28",id:3}
-    ];
- let ageList = data.filter(item =>item.age >= 29)  // {name: "科比", age: "30", id: 1}
-                                                 //  {name: "王治郅", age: "29", id: 2}
+//实例
+function runAsyns() {
+  var p = new Promise(function(resolve, reject) {
+    //做一些异步操作
+    setTimeout(function() {
+      resolve("数据1");
+    }, 2000);
+  });
+  return p;
+}
 
- reduce实现filter功能
- let ageList2 = data.reduce((prev,cur)=>{
-        if (cur.age >= 29) {
-            prev.push(cur);
+runAsyns()
+  .then(val => {
+    console.log(val); // 数据1
+    return new Promise(function(resolve, reject) {
+      resolve("数据2");
+    });
+  })
+  .then(val => {
+    console.log(val); // 数据2
+    return new Promise((resolve, reject) => {
+      resolve("数据3");
+    });
+  })
+  .then(val => {
+    console.log(val); // 数据3
+  });
+```
+
+### async await
+
+async/await:是用同步的方式执行异步的操作，generator+Promise的语法糖;它的实现原理，利用Promise嵌套，再加上generator函数的步骤控制，实现了按顺序执行异步操作的效果；
+> async函数返回的是一个Promise,正常情况下，await命令后面是一个 Promise 对象，返回该对象的结果。如果不是 Promise 对象，就直接返回对应的值。
+```js 
+   //先看一段代码
+   //单一的 Promise 链并不能发现 async/await 的优势，但是，如果需要处理由多个 Promise 组成的 then 链的时候，优势就能体现出来了（很有意思，Promise 通过 then 链来解决多层回调的问题，现在又用 async/await 来进一步优化它）。
+  function takeTime(n){
+        return new Promise((resolve,reject)=>{
+            setTimeout(() => {
+                resolve( (n+200),n)
+            }, 1000);
+        })
+    }
+    function step1(n) {
+            console.log(`step1 with ${n}`);
+            return takeTime(n);
         }
-        return prev
-    },[])
 
+        function step2(n) {
+            console.log(`step2 with ${n}`);
+            return takeTime(n);
+        }
+
+        function step3(n) {
+            console.log(`step3 with ${n}`);
+            return takeTime(n);
+      }
+        function step3(n) {
+            console.log(`step3 with ${n}`);
+            return takeTime(n);
+      }
+      function doIt(){
+         console.time("doIt");
+         const time1 = 300;
+         step1(time1)
+         .then(v => step2(v))
+         .then(v => step3(v))
+         .then(result=>{
+             console.log(result,'end')
+         })
+      }
+     doIt()
+
+     async function doIt2(){
+         console.time("doIt2");
+         const time1 = 300;
+         const time2 = await step1(time1);
+         const time3 = await step2(time2);
+         const result = await step3(time3);
+         console.log(result, 'end')
+     }
+    doIt2()
 ```
 
-### reduce
-```js
-callback （执行数组中每个值的函数，包含四个参数）
-    1、previousValue （上一次调用回调返回的值，或者是提供的初始值（initialValue））
-    2、currentValue （数组中当前被处理的元素）
-    3、index （当前元素在数组中的索引）
-    4、array （调用 reduce 的数组）
-initialValue （作为第一次调用 callback 的第一个参数）
 
 
-var  arr = [1, 2, 3, 4];
-var sum = arr.reduce((x,y)=>x+y)
-var mul = arr.reduce((x,y)=>x*y)
-console.log( sum ); //求和，10
-console.log( mul ); //求乘积，24
-
-```
-
-
-## 其它
+## 6、其它
 ### Object.assign 对象的拷贝
 ```js
 第一个对象为目标对象，如果有相同的属性，会被后面的对象覆盖
@@ -173,6 +243,24 @@ console.log(object1);  // {M: "科比", b: 2, c: 3, a: 1, d: 4}
 ### ES7 includes()判断元素是否存在
 ```js
 ['a', 'b', 'c'].includes('a')     // true
+```
+
+### reduce
+```js
+callback （执行数组中每个值的函数，包含四个参数）
+    1、previousValue （上一次调用回调返回的值，或者是提供的初始值（initialValue））
+    2、currentValue （数组中当前被处理的元素）
+    3、index （当前元素在数组中的索引）
+    4、array （调用 reduce 的数组）
+initialValue （作为第一次调用 callback 的第一个参数）
+
+
+var  arr = [1, 2, 3, 4];
+var sum = arr.reduce((x,y)=>x+y)
+var mul = arr.reduce((x,y)=>x*y)
+console.log( sum ); //求和，10
+console.log( mul ); //求乘积，24
+
 ```
 
 
