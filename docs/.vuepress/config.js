@@ -10,7 +10,7 @@ module.exports = {
 	base: '/blog/',
 	locales: {
 		'/': {
-			title: 'blog',
+			title: 'mxBlog',
 			description: '不积硅步无以至千里'
 		}
 	},

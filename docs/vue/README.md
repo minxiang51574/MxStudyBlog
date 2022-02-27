@@ -387,3 +387,182 @@ function updateChildren(parent, oldCh, newCh) {
 - 3.如果全都不相等 进行暴力对比 如果找到了利用 key 和 index 的映射表来移动老的子节点到前面去 如果找不到就直接插入
 - 4.对老的子节点进行递归 patch 处理
 - 5.后老的子节点有多的就删掉 新的子节点有多的就添加到相应的位置
+
+## 7、nextTick 实现原理
+同步往队列里添加回调函数
+promise => MutationObserver => setImmediate => setTimeout
+
+```js
+// src/observer/scheduler.js
+//先同步把 watcher 都放到队列里面去 执行完队列的事件之后再清空队列
+
+import { nextTick } from "../util/next-tick";
+let queue = [];
+let has = {};
+function flushSchedulerQueue() {
+  for (let index = 0; index < queue.length; index++) {
+    //   调用watcher的run方法 执行真正的更新操作
+    queue[index].run();
+  }
+  // 执行完之后清空队列
+  queue = [];
+  has = {};
+}
+
+// 实现异步队列机制
+export function queueWatcher(watcher) {
+  const id = watcher.id;
+  //   watcher去重
+  if (has[id] === undefined) {
+    //  同步代码执行 把全部的watcher都放到队列里面去
+    queue.push(watcher);
+    has[id] = true;
+    // 进行异步调用
+    nextTick(flushSchedulerQueue);
+  }
+}
+}
+```
+```js
+// src/util/next-tick.js
+
+let callbacks = [];
+let pending = false;
+function flushCallbacks() {
+  pending = false; //把标志还原为false
+  // 依次执行回调
+  for (let i = 0; i < callbacks.length; i++) {
+    callbacks[i]();
+  }
+}
+let timerFunc; //定义异步方法  采用优雅降级
+if (typeof Promise !== "undefined") {
+  // 如果支持promise
+  const p = Promise.resolve();
+  timerFunc = () => {
+    p.then(flushCallbacks);
+  };
+} else if (typeof MutationObserver !== "undefined") {
+  // MutationObserver 主要是监听dom变化 也是一个异步方法
+  let counter = 1;
+  const observer = new MutationObserver(flushCallbacks);
+  const textNode = document.createTextNode(String(counter));
+  observer.observe(textNode, {
+    characterData: true,
+  });
+  timerFunc = () => {
+    counter = (counter + 1) % 2;
+    textNode.data = String(counter);
+  };
+} else if (typeof setImmediate !== "undefined") {
+  // 如果前面都不支持 判断setImmediate
+  timerFunc = () => {
+    setImmediate(flushCallbacks);
+  };
+} else {
+  // 最后降级采用setTimeout
+  timerFunc = () => {
+    setTimeout(flushCallbacks, 0);
+  };
+}
+
+export function nextTick(cb) {
+  // 除了渲染watcher  还有用户自己手动调用的nextTick 一起被收集到数组
+  callbacks.push(cb);
+  if (!pending) {
+    // 如果多次调用nextTick  只会执行一次异步 等异步队列清空之后再把标志变为false
+    pending = true;
+    timerFunc();
+  }
+}
+```
+
+## 8、computed
+
+#### 对计算属性进行属性劫持
+
+- defineComputed 重新定义计算属性,劫持get方法,计算属性依赖的值,需要根据依赖值是否发生变化来判断计算属性是否需要重新计算;
+- createComputedGetter 判断计算属性依赖的值是否变化,Watcher增加dirty标志,如果标志变为 true 代表需要调用 watcher.evaluate重新计算;
+```js
+//  src/state.js
+
+// 定义普通对象用来劫持计算属性
+const sharedPropertyDefinition = {
+  enumerable: true,
+  configurable: true,
+  get: () => {},
+  set: () => {},
+};
+
+// 重新定义计算属性  对get和set劫持
+function defineComputed(target, key, userDef) {
+  if (typeof userDef === "function") {
+    // 如果是一个函数  需要手动赋值到get上
+    sharedPropertyDefinition.get = createComputedGetter(key);
+  } else {
+    sharedPropertyDefinition.get = createComputedGetter(key);
+    sharedPropertyDefinition.set = userDef.set;
+  }
+  //   利用Object.defineProperty来对计算属性的get和set进行劫持
+  Object.defineProperty(target, key, sharedPropertyDefinition);
+}
+
+// 重写计算属性的get方法 来判断是否需要进行重新计算
+function createComputedGetter(key) {
+  return function () {
+    const watcher = this._computedWatchers[key]; //获取对应的计算属性watcher
+    if (watcher) {
+      if (watcher.dirty) {
+        watcher.evaluate(); //计算属性取值的时候 如果是脏的  需要重新求值
+      }
+      return watcher.value;
+    }
+  };
+}
+
+```
+
+```js
+// src/observer/watcher.js
+
+export default class Watcher {
+  constructor(vm, exprOrFn, cb, options) {
+    this.lazy = options.lazy; //标识计算属性watcher
+    this.dirty = this.lazy; //dirty可变  表示计算watcher是否需要重新计算 默认值是true
+    // 非计算属性实例化就会默认调用get方法 进行取值  保留结果 计算属性实例化的时候不会去调用get
+    this.value = this.lazy ? undefined : this.get();
+  }
+  get() {
+    pushTarget(this); // 在调用方法之前先把当前watcher实例推到全局Dep.target上
+    const res = this.getter.call(this.vm); //计算属性在这里执行用户定义的get函数 访问计算属性的依赖项 从而把自身计算Watcher添加到依赖项dep里面收集起来
+    popTarget(); // 在调用方法之后把当前watcher实例从全局Dep.target移除
+    return res;
+  }
+  update() {
+    // 计算属性依赖的值发生变化 只需要把dirty置为true  下次访问到了重新计算
+    if (this.lazy) {
+      this.dirty = true;
+    } else {
+      // 每次watcher进行更新的时候  可以让他们先缓存起来  之后再一起调用
+      // 异步队列机制
+      queueWatcher(this);
+    }
+  }
+  //   计算属性重新进行计算 并且计算完成把dirty置为false
+  evaluate() {
+    this.value = this.get();
+    this.dirty = false;
+  }
+  depend() {
+    // 计算属性的watcher存储了依赖项的dep
+    let i = this.deps.length;
+    while (i--) {
+      this.deps[i].depend(); //调用依赖项的dep去收集渲染watcher
+    }
+  }
+}
+```
+- 1.实例化的时候如果是计算属性 不会去调用 get 方法访问值进行依赖收集
+- 2.update 方法只是把计算 watcher 的 dirty 标识为 true 只有当下次访问到了计算属性的时候才会重新计算
+- 3.新增 evaluate 方法专门用于计算属性重新计算
+- 4.新增 depend 方法 让计算属性的依赖值收集外层 watcher
