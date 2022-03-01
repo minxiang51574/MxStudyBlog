@@ -10,7 +10,7 @@
 function debounce(fn, wait = 50) {
     // 通过闭包缓存一个定时器 id
     let timer = null
-    // 将 debounce 处理结果当作函数返回
+    // 将 debounce 处理结果当作函数返回 
     // 触发事件回调时执行这个返回函数
     return function(...args) {
       	// 如果已经设定过定时器就清空上一次的定时器

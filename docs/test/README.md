@@ -1,5 +1,23 @@
 # 大厂真题
 
+## 极兔
+
+### avue封装？
+### 国际化？
+
+### 主题切换？
+
+## 科脉
+
+### vite + vue3项目遇到了什么问题？
+- 使用vite搭建整体架构，vue3+Typescipt进行项目开发；
+- 引入vue-router4进行路由配置；
+- 接入vite-plugin-compression、rollup-plugin-external-globals等插件进行项目优化；
+
+
+### 小程序性能优化？
+
+
 ## 判断一个对象是数组的方法？
 - Object.prototype.toString.call(xxx)
 - Array.isArray(xxx)

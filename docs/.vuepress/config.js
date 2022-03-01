@@ -31,12 +31,12 @@ module.exports = {
                     },
                     {
                         text: '进阶',
-                        link: "/webImprove/"
+                        link: "/improve/"
                     },
-                    {
-                        text:'webpack',
-                        link:"/webpack/"
-                    },
+                    // {
+                    //     text:'webpack',
+                    //     link:"/webpack/"
+                    // },
                     {
                         text:'手写',
                         link:'/write/',
@@ -85,21 +85,23 @@ module.exports = {
                         '数组',
                         'exam'
                     ],
-                    '/webImprove/': [
+                    '/improve/': [
                         // '',
                         '缓存',
                         'JS执行机制',
-                        '防抖节流'
+                        '防抖节流',
+                        'webpack'
                     ],
-                    '/webpack/':[
-                        ''
-                    ],
+                    // '/webpack/':[
+                    //     ''
+                    // ],
                     '/write/':[ 
                         ''
                     ],
                     '/vue/': [
                         '',
-                        'vue3'
+                        'Vue3',
+                        'Vite'
                     ],
                     '/vueBase/': [
                         '',
