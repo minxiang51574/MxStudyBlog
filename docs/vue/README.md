@@ -1,12 +1,18 @@
 # Vue2
-## 1、vue中几个核心类
+
+## 1、Vue的构造函数
+- instance/index.js 真正的Vue的构造函数,并在Vue的原型上扩展方法
+- core/index.js 增加全局API方法
+- runtime/index.js 扩展$mount方法及平台对应的代码
+![dd](../vueFn.png)
+## 2、vue中几个核心类
 - 1.Observe数据监听器：对data里的属性添加getter/setter，进行**依赖收集**以及**派发更新**。
 - 2.Dep消息订阅器：用于收集当前响应式对象的依赖关系，每个响应式对象都有一个dep实例。dep.subs=watcher[]，当数据发生变化时，触发dep.notify，该方法会遍历subs数组，调用每一个watcher的update方法。
 - 3.Watcher观察者：作为连接 Observer 和 Compile 的桥梁，能够订阅并收到每个属性变动的通知Watcher类有多种，比如computed watcher，user watcher(自己在watch里定义的需要监听数据变化的watcher)。
 - 4.Compile指令解析器：它的作用对每个元素节点的指令进行扫描和解析，根据指令模板替换数据，以及绑定相应的更新函数。
 
 
-## 2、双向数据绑定原理
+## 3、双向数据绑定原理
 ![dd](../vue-model.jpg)
 ### 依赖收集
 - initstate，对computed属性初始化时，触发computed watcher依赖收集
@@ -69,12 +75,12 @@ export function observe(value) {
 
 ```
 
-## 3、Object.defineProperty 缺点？
+## 4、Object.defineProperty 缺点？
 - 不能监听数组的变化
 - 无法检测到对象新增或删除的属性
 - 必须遍历对象的每个属性、深层遍历嵌套的对象
 
-## 4、数组的观测
+## 5、数组的观测
 
 - 1.因为对数组下标的拦截太浪费性能 对 Observer 构造函数传入的数据参数增加了数组的判断
 ```js
@@ -171,7 +177,7 @@ methodsToPatch.forEach((method) => {
 
 ```
 
-## 5、this访问data和methods
+## 6、this访问data和methods
 
 - 通过 this 直接访问到 data 里面的数据的原因是：data里的属性最终会存储到new Vue的实例（vm）上的 _data对象中，访问 this.xxx，是访问Object.defineProperty代理后的 this._data.xxx。
 ```js
@@ -221,7 +227,7 @@ var bind = Function.prototype.bind
 ```
 
 
-## 6、diff算法、虚拟dom
+## 7、diff算法、虚拟dom
 
 ### 虚拟dom
 - 虚拟DOM是一个纯粹的JS对象，可以通过document.createDocumentFragment 创建。
@@ -388,7 +394,7 @@ function updateChildren(parent, oldCh, newCh) {
 - 4.对老的子节点进行递归 patch 处理
 - 5.后老的子节点有多的就删掉 新的子节点有多的就添加到相应的位置
 
-## 7、nextTick 实现原理
+## 8、nextTick 实现原理
 同步往队列里添加回调函数
 promise => MutationObserver => setImmediate => setTimeout
 
@@ -477,7 +483,7 @@ export function nextTick(cb) {
 }
 ```
 
-## 8、computed
+## 9、computed
 
 #### 对计算属性进行属性劫持
 
@@ -566,3 +572,113 @@ export default class Watcher {
 - 2.update 方法只是把计算 watcher 的 dirty 标识为 true 只有当下次访问到了计算属性的时候才会重新计算
 - 3.新增 evaluate 方法专门用于计算属性重新计算
 - 4.新增 depend 方法 让计算属性的依赖值收集外层 watcher
+
+## 10、watch
+
+#### 侦听属性的初始化
+```js
+// src/state.js
+// 统一初始化数据的方法
+export function initState(vm) {
+  // 获取传入的数据对象
+  const opts = vm.$options;
+  if (opts.watch) {
+    //侦听属性初始化
+    initWatch(vm);
+  }
+}
+
+// 初始化watch
+function initWatch(vm) {
+  let watch = vm.$options.watch;
+  for (let k in watch) {
+    const handler = watch[k]; //用户自定义watch的写法可能是数组 对象 函数 字符串
+    if (Array.isArray(handler)) {
+      // 如果是数组就遍历进行创建
+      handler.forEach((handle) => {
+        createWatcher(vm, k, handle);
+      });
+    } else {
+      createWatcher(vm, k, handler);
+    }
+  }
+}
+// 创建watcher的核心
+function createWatcher(vm, exprOrFn, handler, options = {}) {
+  if (typeof handler === "object") {
+    options = handler; //保存用户传入的对象
+    handler = handler.handler; //这个代表真正用户传入的函数
+  }
+  if (typeof handler === "string") {
+    //   代表传入的是定义好的methods方法
+    handler = vm[handler];
+  }
+  //   调用vm.$watch创建用户watcher
+  return vm.$watch(exprOrFn, handler, options);
+}
+
+```
+#### $watch
+```js
+//  src/state.js
+import Watcher from "./observer/watcher";
+Vue.prototype.$watch = function (exprOrFn, cb, options) {
+  const vm = this;
+  //  user: true 这里表示是一个用户watcher
+  let watcher = new Watcher(vm, exprOrFn, cb, { ...options, user: true });
+  // 如果有immediate属性 代表需要立即执行回调
+  if (options.immediate) {
+    cb(); //如果立刻执行
+  }
+};
+
+//原型方法$watch 就是创建自定义 watch 的核心方法 把用户定义的 options 和 user:true 传给构造函数 Watcher
+```
+
+### 1
+```js
+// src/observer/watcher.js
+
+import { isObject } from "../util/index";
+export default class Watcher {
+  constructor(vm, exprOrFn, cb, options) {
+
+    this.user = options.user; //标识用户watcher
+
+    // 如果表达式是一个函数
+    if (typeof exprOrFn === "function") {
+      this.getter = exprOrFn;
+    } else {
+      this.getter = function () {
+        //用户watcher传过来的可能是一个字符串   类似a.a.a.a.b
+        let path = exprOrFn.split(".");
+        let obj = vm;
+        for (let i = 0; i < path.length; i++) {
+          obj = obj[path[i]]; //vm.a.a.a.a.b
+        }
+        return obj;
+      };
+    }
+    // 实例化就进行一次取值操作 进行依赖收集过程
+    this.value = this.get();
+  }
+  run() {
+    const newVal = this.get(); //新值
+    const oldVal = this.value; //老值
+    this.value = newVal; //现在的新值将成为下一次变化的老值
+    if (this.user) {
+      // 如果两次的值不相同  或者值是引用类型 因为引用类型新老值是相等的 他们是指向同一引用地址
+      if (newVal !== oldVal || isObject(newVal)) {
+        this.cb.call(this.vm, newVal, oldVal);
+      }
+    } else {
+      // 渲染watcher
+      this.cb.call(this.vm);
+    }
+  }
+}
+```
+- 1.实例化的时候为了兼容用户 watch 的写法 会将传入的字符串写法转成 Vue 实例对应的值 并且调用 get 方法获取并保存一次旧值
+- 2.run 方法判断如果是用户 watch 那么执行用户传入的回调函数 cb 并且把新值和旧值作为参数传入进去
+
+

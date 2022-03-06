@@ -68,6 +68,10 @@ module.exports = {
                     {
                         text: 'TypeScript',
                         link: '/typeScript/'
+                    },
+                    {
+                        text:'算法',
+                        link:'/arithmetic/'
                     }
                     // {
                     //     text: '项目',
@@ -100,6 +104,7 @@ module.exports = {
                     ],
                     '/vue/': [
                         '',
+                        'Vuex',
                         'Vue3',
                         'Vite'
                     ],
@@ -115,6 +120,7 @@ module.exports = {
                     ],
                     '/node/': [],
                     '/test/': [],
+                    '/arithmetic/':[]
 				}
 			}
 		}
