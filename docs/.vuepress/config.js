@@ -1,11 +1,6 @@
-/*
- * @Author: MX
- * @Date: 2020-11-23 15:18:53
- * @Description: 
- */
 module.exports = {
 	head: [
-		['link', {rel: 'icon', href: '/logo.png'}]
+		['link', {rel: 'icon', href: '/logo2.png'}]
 	],
 	base: '/blog/',
 	locales: {
