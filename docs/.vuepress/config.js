@@ -2,7 +2,7 @@ module.exports = {
 	head: [
 		['link', {rel: 'icon', href: '/logo2.png'}]
 	],
-	base: '/blog/',
+	base: '/mxBlog/',
 	locales: {
 		'/': {
 			title: 'mxBlog',
@@ -40,30 +40,30 @@ module.exports = {
                         text:'Vue',
                         link:'/vue/'
                     },
-                    {
-                        text:'Vue基础',
-                        link:'/vueBase/'
-                    },
+                    // {
+                    //     text:'Vue基础',
+                    //     link:'/vueBase/'
+                    // },
                     {
                         text:'React',
                         link:'/react/'
                     },
-                    {
-                        text: 'React基础',
-                        link: '/reactBase/'
-                    },
+                    // {
+                    //     text: 'React基础',
+                    //     link: '/reactBase/'
+                    // },
                     {
                         text: 'Node',
                         link: '/node/'
                     },
-                    {
-                        text: '大厂真题',
-                        link: '/test/'
-                    },
-                    {
-                        text: 'TypeScript',
-                        link: '/typeScript/'
-                    },
+                    // {
+                    //     text: '大厂真题',
+                    //     link: '/test/'
+                    // },
+                    // {
+                    //     text: 'TypeScript',
+                    //     link: '/typeScript/'
+                    // },
                     {
                         text:'算法',
                         link:'/arithmetic/'
@@ -82,7 +82,7 @@ module.exports = {
                         'JS',
                         'ES6',
                         '数组',
-                        'exam'
+                        // 'exam'
                     ],
                     '/improve/': [
                         // '',
