@@ -85,10 +85,8 @@ module.exports = {
                         // 'exam'
                     ],
                     '/improve/': [
-                        // '',
                         '缓存',
                         'JS执行机制',
-                        '防抖节流',
                         'webpack'
                     ],
                     // '/webpack/':[
