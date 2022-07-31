@@ -60,10 +60,10 @@ module.exports = {
                     //     text: '大厂真题',
                     //     link: '/test/'
                     // },
-                    // {
-                    //     text: 'TypeScript',
-                    //     link: '/typeScript/'
-                    // },
+                    {
+                        text: 'TypeScript',
+                        link: '/typeScript/'
+                    },
                     {
                         text:'算法',
                         link:'/arithmetic/'
