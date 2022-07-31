@@ -87,6 +87,7 @@ module.exports = {
                     '/improve/': [
                         '缓存',
                         'JS执行机制',
+                        'Promise',
                         'webpack'
                     ],
                     // '/webpack/':[
