@@ -1,5 +1,5 @@
-
 # Promise
+## 前言
 **Promise作为异步编程的一种解决方案，无论什么阶段的前端都是需要牢牢掌握，在面试中也是属于必问的。**
 
 ## 一、高频概念问答
@@ -205,7 +205,7 @@ function PromiseAll(promiseArray){
     })
 }
 ```
-### 2、Promise  难度⭐⭐⭐⭐ 
+### 2、Promise  难度⭐⭐⭐⭐⭐
 推荐文章  [硬核! 手把手教你写A+规范的Promise](https://juejin.cn/post/6903765174109339655#heading-0)
 ```js
 class Promose {
@@ -272,11 +272,135 @@ class Promose {
     }
 }
 ```
-### 3、其他手撕 难度⭐⭐⭐
-> 掘金有看到其他大佬的文章，就不重复造车，直接上链接
-> 
-[看了就会，手写 Promise 全部 API 教程](https://juejin.cn/post/7044088065874198536#heading-9)
+### 3、Promise.allSettled 难度⭐⭐⭐
+> 列举几个关键点：
 
+- 1.return Promise 返回也是Promise
+- 2.参数类型判断，传入的参数必须是数组；
+- 3.数组元素类型，判断传入的值是否是promise,使用Promise.resolve 方法会把参数转化为promise；
+- 4.返回结果顺序问题；
+- 5.对每个对象，都有status，如果值为 fulfilled，则上存在一个 value 。如果值为 rejected，则存在一个 reason
+```js
+function allSettled(promises) {
+    return new Promise((resolve, reject) => {
+        // 参数校验
+        if (Array.isArray(promises)) {
+            let result = []; // 存储结果
+            let count = 0; // 计数器
+
+            // 如果传入的是一个空数组，那么就直接返回一个resolved的空数组promise对象
+            if (promises.length === 0) return resolve(promises);
+
+            promises.forEach((item, index) => {
+                // 非promise值，通过Promise.resolve转换为promise进行统一处理
+                myPromise.resolve(item).then(
+                    value => {
+                        count++;
+                        // 对于每个结果对象，都有一个 status 字符串。如果它的值为 fulfilled，则结果对象上存在一个 value 。
+                        result[index] = {
+                            status: 'fulfilled',
+                            value
+                        }
+                        // 所有给定的promise都已经fulfilled或rejected后,返回这个promise
+                        count === promises.length && resolve(result);
+                    },
+                    reason => {
+                        count++;
+                        /**
+                          * 对于每个结果对象，都有一个 status 字符串。如果值为 rejected，则存在一个 reason 。
+                           * value（或 reason ）反映了每个 promise 决议（或拒绝）的值。
+                           */
+                        result[index] = {
+                            status: 'rejected',
+                            reason
+                        }
+                        // 所有给定的promise都已经fulfilled或rejected后,返回这个promise
+                        count === promises.length && resolve(result);
+                    }
+                )
+            })
+        } else {
+            return reject(new TypeError('Argument is not iterable'))
+        }
+    })
+}
+
+
+```
+
+### 4、Promise.race 难度⭐⭐⭐
+```js
+function race(promises) {
+  return new myPromise((resolve, reject) => {
+    // 参数校验
+    if (Array.isArray(promises)) {
+      // 如果传入的迭代promises是空的，则返回的 promise 将永远等待。
+      if (promises.length > 0) {
+        promises.forEach((item) => {
+          /**
+           * 如果迭代包含一个或多个非承诺值和/或已解决/拒绝的承诺，
+           * 则 Promise.race 将解析为迭代中找到的第一个值。
+           */
+          myPromise.resolve(item).then(resolve, reject);
+        });
+      }
+    } else {
+      return reject(new TypeError("Argument is not iterable"));
+    }
+  });
+}
+```
+
+### 5、Promise.resolve 难度⭐⭐
+```js
+Promose.resolve = function (value) {
+  // 如果这个值是一个 promise ，那么将返回这个 promise
+  if (value instanceof myPromise) {
+    return value;
+  } else if (value instanceof Object && "then" in value) {
+    // 如果这个值是thenable（即带有`"then" `方法），返回的promise会“跟随”这个thenable的对象，采用它的最终状态；
+    return new myPromise((resolve, reject) => {
+      value.then(resolve, reject);
+    });
+  }
+
+  // 否则返回的promise将以此值完成，即以此值执行`resolve()`方法 (状态为fulfilled)
+  return new myPromise((resolve) => {
+    resolve(value);
+  });
+};
+```
+
+### 6、Promise.reject 难度⭐⭐
+```js
+/** 
+* myPromise.reject 
+* @param {*} reason 表示Promise被拒绝的原因 
+*/
+Promose.reject = function (reason) {
+  return new myPromise((resolve, reject) => {
+    reject(reason);
+  });
+};
+```
+
+### 7、Promise.finally 难度⭐⭐
+```js
+class myPromise {
+  catch(onRejected) {
+    return this.then(undefined, onRejected);
+  }
+
+  /**
+   * finally
+   * @param {*} callBack 无论结果是fulfilled或者是rejected，都会执行的回调函数
+   * @returns
+   */
+  finally(callBack) {
+    return this.then(callBack, callBack);
+  }
+}
+```
 
 
 ## 三、大厂真题
@@ -333,8 +457,53 @@ PromiseClass.getInfo()
 PromiseClass.getInfo()
 ```
 
+### 3、用Generator实现async和await
+```js
+function* fn() {
+    yield new Promise((resolve, reject) => {
+        setTimeout(() => {
+            console.log("a");
+            resolve("resolve1");
+        }, 500);
+    });
+    yield new Promise((resolve, reject) => {
+        setTimeout(() => {
+            console.log("b");
+            resolve("resolve2");
+        }, 500);
+    });
+    yield new Promise((resolve, reject) => {
+        setTimeout(() => {
+            console.log("c");
+            resolve("resolve3");
+        }, 500);
+    });
+}
+co(fn);
 
+function co(fn) {
+    let f = fn();
+    next();
 
+    function next(data) {
+        let result = f.next();
+        if (!result.done) {
+            // 上一个异步走完了再执行下一个异步
+            result.value.then((Info) => {
+                console.log(Info, data);
+                next(Info);
+            })
+        }
+    }
+}
+>a
+>resolve1 undefined
+>b
+>resolve2 resolve1
+>c
+>resolve3 resolve2
+
+```
 
 
 

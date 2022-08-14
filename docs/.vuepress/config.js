@@ -11,7 +11,7 @@ module.exports = {
 	},
 	serviceWorker: true,
 	themeConfig: {
-		repo: 'docschina/vuepress',
+		repo: 'minxiang51574',
 		editLinks: true,
 		docsDir: 'docs',
 		locales: {
@@ -67,7 +67,7 @@ module.exports = {
                     {
                         text:'算法',
                         link:'/arithmetic/'
-                    }
+                    },
                     // {
                     //     text: '项目',
                     //     link: '/items/'
