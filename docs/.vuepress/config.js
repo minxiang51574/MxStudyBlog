@@ -20,6 +20,10 @@ module.exports = {
 				editLinkText: '编辑此页',
 				lastUpdated: '上次更新',
 				nav: [
+                    {
+                        text: '吐血整理八股',
+                        link: "/allStart/"
+                    },
 					{
                         text: '基础',
                         link: "/base/"
@@ -28,10 +32,6 @@ module.exports = {
                         text: '进阶',
                         link: "/improve/"
                     },
-                    // {
-                    //     text:'webpack',
-                    //     link:"/webpack/"
-                    // },
                     {
                         text:'手写',
                         link:'/write/',
@@ -40,26 +40,26 @@ module.exports = {
                         text:'Vue',
                         link:'/vue/'
                     },
-                    // {
-                    //     text:'Vue基础',
-                    //     link:'/vueBase/'
-                    // },
+                    {
+                        text:'Vue基础',
+                        link:'/vueBase/'
+                    },
                     {
                         text:'React',
                         link:'/react/'
                     },
-                    // {
-                    //     text: 'React基础',
-                    //     link: '/reactBase/'
-                    // },
+                    {
+                        text: 'React基础',
+                        link: '/reactBase/'
+                    },
                     {
                         text: 'Node',
                         link: '/node/'
                     },
-                    // {
-                    //     text: '大厂真题',
-                    //     link: '/test/'
-                    // },
+                    {
+                        text: '大厂真题',
+                        link: '/test/'
+                    },
                     {
                         text: 'TypeScript',
                         link: '/typeScript/'
@@ -74,6 +74,13 @@ module.exports = {
                     // },
 				],
 				sidebar: {
+                    '/allStart/':[
+                        '',
+                        'CSS',
+                        'JavaScript',
+                        'HTTP',
+
+                    ],
 					'/base/': [
                         // '',
                         'HTTP',
