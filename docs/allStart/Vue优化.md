@@ -118,7 +118,7 @@ attempt: 1
 
 
 
-<img v-lazy="/static/img/1.png">
+<!-- <img v-lazy="/static/img/1.png"> -->
 以上为 vue-lazyload 插件的简单使用，如果要看插件的更多参数选项，可以查看 vue-lazyload 的 github 地址。
 
 **1.7、路由懒加载**

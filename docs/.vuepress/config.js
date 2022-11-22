@@ -85,7 +85,8 @@ module.exports = {
                         '前端工程化',
                         '代码输出',
                         'Vue',
-                        'Vue优化'
+                        'Vue优化',
+                        'LeetCode'
 
                     ],
 					'/base/': [
