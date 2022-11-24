@@ -1,5 +1,5 @@
 # 一、HTML篇
-![HTML面试题.png](https://cdn.nlark.com/yuque/0/2021/png/1500604/1621600195788-acab59b1-a654-4ec4-b9c2-0a491a660671.png)
+![HTML面试题.png](../images/HTMLTest.png)
 
 ## 1. src 和 href 的区别
 
@@ -511,3 +511,32 @@ head 标签用于定义文档的头部，它是所有头部元素的容器。hea
 - dragleave：事件主体是目标元素，在被拖放元素移出目标元素是触发。
 - drop：事件主体是目标元素，在目标元素完全接受被拖放元素时触发。
 - dragend：事件主体是被拖放元素，在整个拖放操作结束时触发。
+
+## 21. 重绘与回流
+
+
+- 重绘: 元素外观、风格改变时，不影响布局，则为重绘，因此 损耗较少
+- 重排(回流): 尺寸、布局、结构改变时，引起页面重新构建
+- 区别：回流一定引起重绘，重绘不一定引起回流
+- 浏览器帮忙：浏览器维护一个队列，把所有引起回流、重绘的操作放入这个队列，等队列到了一定数量或者到了一定的时间间隔，浏览器就会清空队列，进行批量处理
+   会触发重排的操作:
+    * 页面初次渲染
+    * 浏览器窗口大小改变
+    * 元素尺寸、位置、内容发生改变
+    * 元素字体大小变化
+    * 添加或者删除可见的 dom 元素
+    * 激活 CSS 伪类（例如：:hover）
+    * 查询某些属性或调用某些方法
+    * clientWidth、clientHeight、clientTop、clientLeft
+    * offsetWidth、offsetHeight、offsetTop、offsetLeft
+    * scrollWidth、scrollHeight、scrollTop、scrollLeft
+    * getComputedStyle()
+    * getBoundingClientRect()
+    * scrollTo() 
+
+    ### 减少重排和重绘
+    - 1.少用display position等与位置相关
+    - 2.批量修改DOM或者样式、避免一条一条操作
+    - 3.dom离线（display控制显隐，从文档流中脱离，然后恢复）
+    - 4.动画使用绝对定位让它脱离文档流，不然会影响父元素或后续元素的频繁回流
+    - 5.GPU加速：transform、opacity、filters、will-change等样式
