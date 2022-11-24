@@ -1,5 +1,5 @@
 # 二、CSS篇
-![img](https://cdn.nlark.com/yuque/0/2021/png/1500604/1618650369902-a402f0bc-d213-4330-93ea-6cb1a9bd3976.png?x-oss-process=image%2Fresize%2Cw_1038)
+![img](../images/CSSTest.png)
 
 ## 1、CSS 基础
 
@@ -139,10 +139,22 @@
 - link 是 XHTML 标签，无兼容问题；@import 是在 CSS2.1 提出的，低版本的浏览器不支持。
 - link 支持使用 Javascript 控制 DOM 去改变样式；而@import 不支持。
 
-### 7. transition 和 animation 的区别---了解即可
+### 7. transition 和 animation 
 
 - **transition 是过度属性**，强调过度，它的实现需要触发一个事件（比如鼠标移动上去，焦点，点击等）才执行动画。它类似于 flash 的补间动画，设置一个开始关键帧，一个结束关键帧。
+  - transition-property 属性
+  - transition-duration 时长
+  - transition-timing-function 曲线
+  - transition-delay 延迟
+
+
 - **animation 是动画属性**，它的实现不需要触发事件，设定好时间之后可以自己执行，且可以循环一个动画。它也类似于 flash 的补间动画，但是它可以设置多个关键帧（用@keyframe 定义）完成动画。
+  - animation-name: 动画名称，对应@keyframes
+  - animation-duration: 间隔
+  - animation-timing-function: 曲线
+  - animation-delay: 延迟
+  - animation-iteration-count: 次数 ——infinite: 循环动画
+  - animation-direction: 方向 ——alternate: 反向播放
 
 ### 8. display:none 与 visibility:hidden 的区别
 
@@ -205,20 +217,19 @@ MDN 对该方法的描述：
 - settimeout 任务被放入异步队列，只有当主线程任务执行完后才会执行队列中的任务，因此实际执行时间总是比设定时间要晚；
 - settimeout 的固定时间间隔不一定与屏幕刷新间隔时间相同，会引起丢帧。
 
-### 11. 对盒模型的理解
+### 11. 盒模型
 
 CSS3 中的盒模型有以下两种：标准盒子模型、IE 盒子模型
 
-![image](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603600820746-e10daafa-451a-454e-9705-f8c358769d5b.png#align=left&display=inline&height=366&margin=%5Bobject%20Object%5D&originHeight=455&originWidth=746&size=0&status=done&style=none&width=600)
+- **content-box (W3C 标准盒模型)**
+  ::: tip 在标准的盒子模型中
+  width 和 height 指 content 部分的宽度
+  :::
 
-![img](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603600820555-dc6ed390-d47e-412b-942a-857bbe5f280d.png?x-oss-process=image%2Fresize%2Cw_746#align=left&display=inline&height=368&margin=%5Bobject%20Object%5D&originHeight=462&originWidth=791&size=0&status=done&style=none&width=630)
-
-盒模型都是由四个部分组成的，分别是 margin、border、padding 和 content。
-
-标准盒模型和 IE 盒模型的区别在于设置 width 和 height 时，所对应的范围不同：
-
-- 标准盒模型的 width 和 height 属性的范围只包含了 content，
-- IE 盒模型的 width 和 height 属性的范围包含了 border、padding 和 content。
+- **border-box (IE 盒模型)**
+  ::: warning 在 IE 盒子模型中
+  width 和 height 表示 content+padding+border 这三个部分的宽度
+  :::
 
 可以通过修改元素的 box-sizing 属性来改变元素的盒模型：
 
@@ -448,24 +459,33 @@ my-image { background: (low.png); }
 - `margin`正值时，可以让`margin`使用负值解决；
 - 使用`font-size`时，可通过设置`font-size:0`、`letter-spacing`、`word-spacing`解决；
 
-### 25. 单行、多行文本溢出隐藏
+### 25. 控制文本内容显示省略号
 
 - 单行文本溢出
 
 ```css
-overflow: hidden;            // 溢出隐藏
-text-overflow: ellipsis;      // 溢出用省略号显示
-white-space: nowrap;         // 规定段落中的文本不进行换行
+div{
+　　width:200px;
+　　overflow:hidden;
+　　white-space:nowrap;
+　　text-overflow:ellipsis;
+}
 ```
 
 - 多行文本溢出
 
 ```css
-overflow: hidden;            // 溢出隐藏
-text-overflow: ellipsis;     // 溢出用省略号显示
-display:-webkit-box;         // 作为弹性伸缩盒子模型显示。
--webkit-box-orient:vertical; // 设置伸缩盒子的子元素排列方式：从上到下垂直排列
--webkit-line-clamp:3;        // 显示的行数
+div{
+　　width:200px;
+　　overflow:hidden;
+　　text-overflow:ellipsis;
+　　display:-webkit-box;//将对象作为弹性伸缩盒子模型显示
+　　-webkit-line-clamp:2;//控制显示几行文字
+　　-webkit-box-orient:vertical;//设置伸缩盒对象的子元素排列方式
+}
+如果你标签内的是英文，英文是不会自动换行的，所以你需要让英文自动换行,添加一下代码
+word-wrap:break-word;
+word-break:break-all;
 ```
 
 注意：由于上面的三个属性都是 CSS3 的属性，没有浏览器可以兼容，所以要在前面加一个`-webkit-` 来兼容一部分浏览器。
@@ -598,29 +618,29 @@ CSS**`transform`**属性允许你<u>旋转，缩放，倾斜或平移</u>给定�
 
  **`<transform-function>`** CSS数据类型用于对元素的显示做变换。通常，这种变换可以由矩阵表示，并且可以使用每个点上的矩阵乘法来确定所得到的图像。下面简单展示下`<transform-function>`值都有哪些（来自菜鸟教程，如果想要了解细则请点击[这里](https://developer.mozilla.org/zh-CN/docs/Web/CSS/transform-function)进入MDN官方文档）
 
-| none                                                         | 定义不进行转换。                        |
-| ------------------------------------------------------------ | --------------------------------------- |
-| **matrix(*n*,*n*,*n*,*n*,*n*,*n*)**                          | 定义 2D 转换，使用六个值的矩阵。        |
+| none                                                                      | 定义不进行转换。                        |
+| ------------------------------------------------------------------------- | --------------------------------------- |
+| **matrix(*n*,*n*,*n*,*n*,*n*,*n*)**                                       | 定义 2D 转换，使用六个值的矩阵。        |
 | matrix3d(*n*,*n*,*n*,*n*,*n*,*n*,*n*,*n*,*n*,*n*,*n*,*n*,*n*,*n*,*n*,*n*) | 定义 3D 转换，使用 16 个值的 4x4 矩阵。 |
-| **translate(*x*,*y*)**                                       | 定义 2D 转换。（平移）                  |
-| translate3d(*x*,*y*,*z*)                                     | 定义 3D 转换。                          |
-| translateX(*x*)                                              | 定义转换，只是用 X 轴的值。             |
-| translateY(*y*)                                              | 定义转换，只是用 Y 轴的值。             |
-| translateZ(*z*)                                              | 定义 3D 转换，只是用 Z 轴的值。         |
-| **scale(*x*,*y*)**                                           | 定义 2D 缩放转换。                      |
-| scale3d(*x*,*y*,*z*)                                         | 定义 3D 缩放转换。                      |
-| scaleX(*x*)                                                  | 通过设置 X 轴的值来定义缩放转换。       |
-| scaleY(*y*)                                                  | 通过设置 Y 轴的值来定义缩放转换。       |
-| scaleZ(*z*)                                                  | 通过设置 Z 轴的值来定义 3D 缩放转换。   |
-| **rotate(*angle*)**                                          | 定义 2D 旋转，在参数中规定角度。        |
-| rotate3d(*x*,*y*,*z*,*angle*)                                | 定义 3D 旋转。                          |
-| rotateX(*angle*)                                             | 定义沿着 X 轴的 3D 旋转。               |
-| rotateY(*angle*)                                             | 定义沿着 Y 轴的 3D 旋转。               |
-| rotateZ(*angle*)                                             | 定义沿着 Z 轴的 3D 旋转。               |
-| **skew(*x-angle*,*y-angle*)**                                | 定义沿着 X 和 Y 轴的 2D 倾斜转换。      |
-| skewX(*angle*)                                               | 定义沿着 X 轴的 2D 倾斜转换。           |
-| skewY(*angle*)                                               | 定义沿着 Y 轴的 2D 倾斜转换。           |
-| perspective(*n*)                                             | 为 3D 转换元素定义透视视图。            |
+| **translate(*x*,*y*)**                                                    | 定义 2D 转换。（平移）                  |
+| translate3d(*x*,*y*,*z*)                                                  | 定义 3D 转换。                          |
+| translateX(*x*)                                                           | 定义转换，只是用 X 轴的值。             |
+| translateY(*y*)                                                           | 定义转换，只是用 Y 轴的值。             |
+| translateZ(*z*)                                                           | 定义 3D 转换，只是用 Z 轴的值。         |
+| **scale(*x*,*y*)**                                                        | 定义 2D 缩放转换。                      |
+| scale3d(*x*,*y*,*z*)                                                      | 定义 3D 缩放转换。                      |
+| scaleX(*x*)                                                               | 通过设置 X 轴的值来定义缩放转换。       |
+| scaleY(*y*)                                                               | 通过设置 Y 轴的值来定义缩放转换。       |
+| scaleZ(*z*)                                                               | 通过设置 Z 轴的值来定义 3D 缩放转换。   |
+| **rotate(*angle*)**                                                       | 定义 2D 旋转，在参数中规定角度。        |
+| rotate3d(*x*,*y*,*z*,*angle*)                                             | 定义 3D 旋转。                          |
+| rotateX(*angle*)                                                          | 定义沿着 X 轴的 3D 旋转。               |
+| rotateY(*angle*)                                                          | 定义沿着 Y 轴的 3D 旋转。               |
+| rotateZ(*angle*)                                                          | 定义沿着 Z 轴的 3D 旋转。               |
+| **skew(*x-angle*,*y-angle*)**                                             | 定义沿着 X 和 Y 轴的 2D 倾斜转换。      |
+| skewX(*angle*)                                                            | 定义沿着 X 轴的 2D 倾斜转换。           |
+| skewY(*angle*)                                                            | 定义沿着 Y 轴的 2D 倾斜转换。           |
+| perspective(*n*)                                                          | 为 3D 转换元素定义透视视图。            |
 
 ## 2、页面布局
 
@@ -665,99 +685,67 @@ CSS**`transform`**属性允许你<u>旋转，缩放，倾斜或平移</u>给定�
 - 对于只需要适配少部分移动设备，且分辨率对页面影响不大的，使用 px 即可 。
 - 对于需要适配各种移动设备，使用 rem，例如需要适配 iPhone 和 iPad 等分辨率差别比较挺大的设备。
 
-### 3. 两栏布局的实现
-
-一般两栏布局指的是**左边一栏宽度固定，右边一栏宽度自适应**，两栏布局的具体实现：
-
-- 利用浮动，将左边元素宽度设置为 200px，并且设置向左浮动。将右边元素的 margin-left 设置为 200px，宽度设置为 auto（默认为 auto，撑满整个父元素）。
+### 3. 两栏布局实现(左侧固定，右边自适应)
 
 ```css
-.outer {
-  height: 100px;
-}
-.left {
-  float: left;
-  width: 200px;
-  background: tomato;
-}
-.right {
-  margin-left: 200px;
-  width: auto;
-  background: gold;
-}
-```
+        方法1  浮动+margin
+        先让固定宽度的div浮动,使其脱离文档流,margin-left的值等于固定div的宽度相等。
+        .left{
+            width: 200px;
+            background-color: bisque;
+            float: left;
+        }
+        .right{
+            margin-left:200px;
+           background-color: #000000;
+        }
 
-- 利用浮动，左侧元素设置固定大小，并左浮动，右侧元素设置 overflow: hidden; 这样右边就触发了 BFC，BFC 的区域不会与浮动元素发生重叠，所以两侧就不会发生重叠。
+        方法2  定位+margin
+        父元素相对定位 .left绝对定位
+        .left{
+            width: 200px;
+            background-color: bisque;
+            position: absolute;   //对比方法1 float:left
+        }
+        .right{
+            margin-left:200px;
+           background-color: #000000;
+        }
 
-```css
-.left{
-     width: 100px;
-     height: 200px;
-     background: red;
-     float: left;
- }
- .right{
-     height: 300px;
-     background: blue;
-     overflow: hidden;
- }
-```
+        方法3  calc()计算属性 需要兼容
+        注意两个div必须一左一右浮动,calc的宽度必须要减去的宽度要与固定宽度保持一致
 
-- 利用 flex 布局，将左边元素设置为固定宽度 200px，将右边的元素设置为 flex:1。
+        .left{
+            width: 200px;
+            background-color: bisque;
+            float: left;
+        }
+        .right{
+             float: right;
+             width:  calc(100% - 200px);
+             background-color: #000000;
+        }
 
-```css
-.outer {
-  display: flex;
-  height: 100px;
-}
-.left {
-  width: 200px;
-  background: tomato;
-}
-.right {
-  flex: 1;
-  background: gold;
-}
-```
+        方法4  flex 需要兼容
+        section{
+            display:flex;
+        }
+        .left{
+            width: 200px;
+            background-color: bisque;
+        }
+        .right{
+           flex: 1;
+           background-color: #000000;
+        }
 
-- 利用绝对定位，将父级元素设置为相对定位。左边元素设置为 absolute 定位，并且宽度设置为 200px。将右边元素的 margin-left 的值设置为 200px。
+        方法5  grid 网格布局 
+        section{
+            display: grid;
+            grid-template-rows: 100px;
+            grid-template-columns: 200px auto 200px;
+        }
 
-```css
-.outer {
-  position: relative;
-  height: 100px;
-}
-.left {
-  position: absolute;
-  width: 200px;
-  height: 100px;
-  background: tomato;
-}
-.right {
-  margin-left: 200px;
-  background: gold;
-}
-```
-
-- 利用绝对定位，将父级元素设置为相对定位。左边元素宽度设置为 200px，右边元素设置为绝对定位，左边定位为 200px，其余方向定位为 0。
-
-```css
-.outer {
-  position: relative;
-  height: 100px;
-}
-.left {
-  width: 200px;
-  background: tomato;
-}
-.right {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 200px;
-  background: gold;
-}
 ```
 
 ### 4. 三栏布局的实现
@@ -816,35 +804,6 @@ CSS**`transform`**属性允许你<u>旋转，缩放，倾斜或平移</u>给定�
 
 .center {
   flex: 1;
-  background: lightgreen;
-}
-```
-
-- 利用浮动，左右两栏设置固定大小，并设置对应方向的浮动。中间一栏设置左右两个方向的 margin 值，注意这种方式**，中间一栏必须放到最后：**
-
-```css
-.outer {
-  height: 100px;
-}
-
-.left {
-  float: left;
-  width: 100px;
-  height: 100px;
-  background: tomato;
-}
-
-.right {
-  float: right;
-  width: 200px;
-  height: 100px;
-  background: gold;
-}
-
-.center {
-  height: 100px;
-  margin-left: 100px;
-  margin-right: 200px;
   background: lightgreen;
 }
 ```
@@ -1004,16 +963,27 @@ CSS**`transform`**属性允许你<u>旋转，缩放，倾斜或平移</u>给定�
 
 Flex 是 FlexibleBox 的缩写，意为"弹性布局"，用来为盒状模型提供最大的灵活性。任何一个容器都可以指定为 Flex 布局。行内元素也可以使用 Flex 布局。注意，设为 Flex 布局以后，**子元素的 float、clear 和 vertical-align 属性将失效**。采用 Flex 布局的元素，称为 Flex 容器（flex container），简称"容器"。它的所有子元素自动成为容器成员，称为 Flex 项目（flex item），简称"项目"。容器默认存在两根轴：水平的主轴（main axis）和垂直的交叉轴（cross axis），项目默认沿水平主轴排列。
 
-以下 6 个属性设置在**容器上**：
+**容器属性**：
 
 - flex-direction 属性决定主轴的方向（即项目的排列方向）。
 - flex-wrap 属性定义，如果一条轴线排不下，如何换行。
 - flex-flow 属性是 flex-direction 属性和 flex-wrap 属性的简写形式，默认值为 row nowrap。
 - justify-content 属性定义了项目在主轴上的对齐方式。
+    - flex-start（默认值）：左对齐
+    - flex-end：右对齐
+    - center： 居中
+    - space-between：两端对齐，项目之间的间隔都相等。
+    - space-around：每个项目两侧的间隔相等。
 - align-items 属性定义项目在交叉轴上如何对齐。
+    - flex-start：交叉轴的起点对齐。
+    - flex-end：交叉轴的终点对齐。
+    - center：交叉轴的中点对齐。
+    - baseline: 项目的第一行文字的基线对齐。
+    - stretch（默认值）：如果项目未设置高度或设为auto，将占满整个容器的高度。
 - align-content 属性定义了多根轴线的对齐方式。如果项目只有一根轴线，该属性不起作用。
 
-以下 6 个属性设置在**项目上**：
+
+**项目属性**：
 
 - order 属性定义项目的排列顺序。数值越小，排列越靠前，默认为 0。
 - flex-grow 属性定义项目的放大比例，默认为 0，即如果存在剩余空间，也不放大。
@@ -1022,9 +992,6 @@ Flex 是 FlexibleBox 的缩写，意为"弹性布局"，用来为盒状模型提
 - flex 属性是 flex-grow，flex-shrink 和 flex-basis 的简写，默认值为 0 1 auto。
 - align-self 属性允许单个项目有与其他项目不一样的对齐方式，可覆盖 align-items 属性。默认值为 auto，表示继承父元素的 align-items 属性，如果没有父元素，则等同于 stretch。
 
-**简单来说：**
-
-flex 布局是 CSS3 新增的一种布局方式，可以通过将一个元素的 display 属性值设置为 flex 从而使它成为一个 flex 容器，它的所有子元素都会成为它的项目。一个容器默认有两条轴：一个是水平的主轴，一个是与主轴垂直的交叉轴。可以使用 flex-direction 来指定主轴的方向。可以使用 justify-content 来指定元素在主轴上的排列方式，使用 align-items 来指定元素在交叉轴上的排列方式。还可以使用 flex-wrap 来规定当一行排列不下时的换行方式。对于容器中的项目，可以使用 order 属性来指定项目的排列顺序，还可以使用 flex-grow 来指定当排列空间有剩余的时候，项目的放大比例，还可以使用 flex-shrink 来指定当排列空间不足时，项目的缩小比例。
 
 ### 8. 响应式设计的概念及基本原理
 
@@ -1214,13 +1181,13 @@ clear 属性只有块级元素才有效的，而::after 等伪元素默认都是
 
 position 有以下属性值：
 
-| 属性值   | 概述                                                                                                                                                 |
-| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| absolute | 生成绝对定位的元素，相对于 static 定位以外的一个父元素进行定位。元素的位置通过 left、top、right、bottom 属性进行规定。                               |
-| relative | 生成相对定位的元素，相对于其原来的位置进行定位。元素的位置通过 left、top、right、bottom 属性进行规定。                                               |
+| 属性值   | 概述                                                                                                                                            |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| absolute | 生成绝对定位的元素，相对于 static 定位以外的一个父元素进行定位。元素的位置通过 left、top、right、bottom 属性进行规定。                          |
+| relative | 生成相对定位的元素，相对于其原来的位置进行定位。元素的位置通过 left、top、right、bottom 属性进行规定。                                          |
 | fixed    | 生成绝对定位的元素，指定元素相对于屏幕视⼝（viewport）的位置来指定元素位置。元素的位置在屏幕滚动时不会改变，⽐如回到顶部的按钮⼀般都是⽤此定位⽅式。 |
-| static   | 默认值，没有定位，元素出现在正常的文档流中，会忽略 top, bottom, left, right 或者 z-index 声明，块级元素从上往下纵向排布，⾏级元素从左向右排列。      |
-| inherit  | 规定从父元素继承 position 属性的值                                                                                                                   |
+| static   | 默认值，没有定位，元素出现在正常的文档流中，会忽略 top, bottom, left, right 或者 z-index 声明，块级元素从上往下纵向排布，⾏级元素从左向右排列。  |
+| inherit  | 规定从父元素继承 position 属性的值                                                                                                              |
 
 前面三者的定位方式如下：
 
@@ -1288,80 +1255,35 @@ div {
 
 将元素的长宽都设置为 0，显示出来的效果是这样的：
 
-![image](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603636245125-d60dca78-0577-4aa1-8809-f1d38594889a.png#align=left&display=inline&height=298&margin=%5Bobject%20Object%5D&originHeight=502&originWidth=1012&size=0&status=done&style=stroke&width=600)
+![image](../images/sjx1.png)
 
 所以可以根据 border 这个特性来绘制三角形：
-
-**（1）三角 1**
-
 ```css
-div {
-    width: 0;
-    height: 0;
-    border-top: 50px solid red;
-    border-right: 50px solid transparent;
-    border-left: 50px solid transparent;
+ .box{
+	width:0;
+	height:0;
+	border-width: 50px;
+    border-style: solid;
+	border-color:transparent transparent transparent #ef4848;
 }
-```
 
-![img](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603636245420-28c28277-5074-4725-9386-ffc955cf950a.png?x-oss-process=image%2Fresize%2Cw_500#align=left&display=inline&height=132&margin=%5Bobject%20Object%5D&originHeight=162&originWidth=738&size=0&status=done&style=stroke&width=600)
-
-**（2）三角 2**
-
-```css
-div {
-    width: 0;
-    height: 0;
-    border-bottom: 50px solid red;
-    border-right: 50px solid transparent;
-    border-left: 50px solid transparent;
+.box{
+	width:0;
+	height:0;
+	border: 50px solid transparent;
+	border-top-color: red;
 }
-```
 
-![img](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603636245172-36f955bd-075b-442a-b88b-6c084c66ed25.png?x-oss-process=image%2Fresize%2Cw_500#align=left&display=inline&height=133&margin=%5Bobject%20Object%5D&originHeight=140&originWidth=630&size=0&status=done&style=stroke&width=600)
-
-**（3）三角 3**
-
-```css
-div {
-    width: 0;
-    height: 0;
-    border-left: 50px solid red;
-    border-top: 50px solid transparent;
-    border-bottom: 50px solid transparent;
+//三角箭头  正方形设置两边颜色然后旋转
+.box{
+    width: 12px;
+    height: 12px;
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+    transform: rotate(225deg);
 }
+
 ```
-
-![img](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603636245082-84a06746-dfc7-4782-a0d4-27d521aecac7.png?x-oss-process=image%2Fresize%2Cw_500#align=left&display=inline&height=195&margin=%5Bobject%20Object%5D&originHeight=210&originWidth=646&size=0&status=done&style=stroke&width=600)
-
-**（4）三角 4**
-
-```css
-div {
-    width: 0;
-    height: 0;
-    border-right: 50px solid red;
-    border-top: 50px solid transparent;
-    border-bottom: 50px solid transparent;
-}
-```
-
-![img](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603636245064-ecd01197-99fc-476e-897f-a4165b55792a.png?x-oss-process=image%2Fresize%2Cw_500#align=left&display=inline&height=191&margin=%5Bobject%20Object%5D&originHeight=220&originWidth=690&size=0&status=done&style=stroke&width=600)
-
-**（5）三角 5**
-
-```css
-div {
-    width: 0;
-    height: 0;
-    border-top: 100px solid red;
-    border-right: 100px solid transparent;
-}
-```
-
-![img](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603636245095-5b40d585-7e68-4bb0-aaef-6c8fce7d36b8.png?x-oss-process=image%2Fresize%2Cw_500#align=left&display=inline&height=177&margin=%5Bobject%20Object%5D&originHeight=218&originWidth=738&size=0&status=done&style=stroke&width=600)
-
-还有很多，就不一一实现了，总体的原则就是通过上下左右边框来控制三角形的方向，用边框的宽度比来控制三角形的角度。
 
 ### 2. 实现一个扇形
 
@@ -1371,13 +1293,13 @@ div {
 div{
     border: 100px solid transparent;
     width: 0;
-    heigt: 0;
+    height: 0;
     border-radius: 100px;
     border-top-color: red;
 }
 ```
 
-![img](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603636444767-26da7bbe-5479-44e2-9088-50c9211d6c0d.png?x-oss-process=image%2Fresize%2Cw_500#align=left&display=inline&height=190&margin=%5Bobject%20Object%5D&originHeight=234&originWidth=738&size=0&status=done&style=none&width=600)
+![img](../images/sx.png)
 
 ### 3. 实现一个宽高自适应的正方形
 
@@ -1453,7 +1375,7 @@ window.devicePixelRatio = 设备的物理像素 / CSS像素。
 
 打开 Chrome 浏览器，启动移动端调试模式，在控制台去输出这个 `devicePixelRatio` 的值。这里选中 iPhone6/7/8 这系列的机型，输出的结果就是 2：
 
-![image](https://cdn.nlark.com/yuque/0/2021/jpeg/1500604/1615998119364-e2b81466-ba5b-4eb8-af5f-61c5621bb0af.jpeg?x-oss-process=image%2Fresize%2Cw_1500)
+![image](../images/devicePixelRatio.png)
 
 这就意味着设置的 1px CSS 像素，在这个设备上实际会用 2 个物理像素单元来进行渲染，所以实际看到的一定会比 1px 粗一些。
 
