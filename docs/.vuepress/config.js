@@ -119,7 +119,7 @@ module.exports = {
                     ],
                     '/vueBase/': [
                         '',
-                        'vue源码分析'
+                        'Vue源码分析'
                     ],
                     '/react/': [
                         '',
