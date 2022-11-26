@@ -2772,22 +2772,28 @@ this 是执行上下文中的一个属性，它指向最后一次调用这个方
 - 返回结果。
 
 ```js
+// call函数实现
 Function.prototype.myCall = function(context) {
-  // 判断调用对象
-  if (typeof this !== "function") {
-    console.error("type error");
-  }
-  // 获取参数
-  let args = [...arguments].slice(1),
-    result = null;
   // 判断 context 是否传入，如果未传入则设置为 window
   context = context || window;
   // 将调用函数设为对象的方法
   context.fn = this;
+  // 获取参数
+  let args = [...arguments].slice(1)
   // 调用函数
-  result = context.fn(...args);
+  let result = context.fn(...args);
   // 将属性删除
   delete context.fn;
+  return result;
+};
+
+Function.prototype.myCall = function(context = window, ...args) {
+  // 在context上加一个唯一值不影响context上的属性
+  let key = Symbol('key')
+  context[key] = this; // context为调用的上下文,this此处为函数，将这个函数作为context的方法
+  // let args = [...arguments].slice(1)   //第一个参数为obj所以删除,伪数组转为数组
+  let result = context[key](...args);
+  delete context[key]; // 不删除会导致context属性越来越多
   return result;
 };
 ```
@@ -2803,16 +2809,13 @@ Function.prototype.myCall = function(context) {
 - 返回结果
 
 ```js
+// apply 函数实现
 Function.prototype.myApply = function(context) {
-  // 判断调用对象是否为函数
-  if (typeof this !== "function") {
-    throw new TypeError("Error");
-  }
-  let result = null;
   // 判断 context 是否存在，如果未传入则为 window
   context = context || window;
   // 将函数设为对象的方法
   context.fn = this;
+  let result = null;
   // 调用方法
   if (arguments[1]) {
     result = context.fn(...arguments[1]);
@@ -2823,6 +2826,15 @@ Function.prototype.myApply = function(context) {
   delete context.fn;
   return result;
 };
+
+Function.prototype.myApply = function(context = window, ...args) {
+  let key = Symbol('key')
+  context[key] = this; // context为调用的上下文,this此处为函数，将这个函数作为context的方法
+  // let args = [...arguments[1]]   //第一个参数为obj所以删除,伪数组转为数组
+  let result = context[key](args); // 这里和call传参不一样
+  delete context[key]; // 不删除会导致context属性越来越多
+  return result;
+}
 ```
 
 **（3）bind 函数的实现步骤：**
@@ -2833,22 +2845,28 @@ Function.prototype.myApply = function(context) {
 - 函数内部使用 apply 来绑定函数调用，需要判断函数作为构造函数的情况，这个时候需要传入当前函数的 this 给 apply 调用，其余情况都传入指定的上下文对象。
 
 ```js
+// bind 函数实现
 Function.prototype.myBind = function(context) {
-  // 判断调用对象是否为函数
-  if (typeof this !== "function") {
-    throw new TypeError("Error");
-  }
-  // 获取参数
-  var args = [...arguments].slice(1),
-    fn = this;
-  return function Fn() {
-    // 根据调用方式，传入不同绑定值
-    return fn.apply(
-      this instanceof Fn ? this : context,
-      args.concat(...arguments)
-    );
-  };
+   let arg = [...arguments].slice(1)
+    //var arg = Array.prototype.slice.call(arguments, 1)
+    // Array.prototype.slice.call(arguments)能将具有length属性的对象转成数组
+    var result = this
+    return function () {
+        arg = arg.concat([...arguments])
+        //arg = arg.concat(Array.prototype.slice.call(arguments))
+        return result.apply(obj, arg)
+    }
 };
+
+Function.prototype.myBind = function (context, ...outerArgs) {
+  // this->func context->obj outerArgs->[10,20]
+  let result = this
+  // 返回一个函数
+  return function F(...innerArgs) { //返回了一个函数，...innerArgs为实际调用时传入的参数
+    // 把func执行，并且改变this即可
+    return result.apply(context, [...outerArgs, ...innerArgs]) //返回改变了this的函数，参数合并
+  }
+}
 ```
 
 ## 7、异步编程
@@ -3509,7 +3527,7 @@ async function fn(){
 }
 ```
 
-### 12. 并发与并行的区别？---了解即可
+### 12. 并发与并行的区别？
 
 - 并发是宏观概念，我分别有任务 A 和任务 B，在一段时间内通过任务间的切换完成了这两个任务，这种情况就可以称之为并发。
 - 并行是微观概念，假设 CPU 中存在两个核心，那么我就可以同时完成任务 A、B。同时完成多个任务的情况就可以称之为并行。
@@ -3753,15 +3771,15 @@ obj2.a =  null
 
 虽然浏览器可以进行垃圾自动回收，但是当代码比较复杂时，垃圾回收所带来的代价比较大，所以应该尽量减少垃圾回收。
 
-- **对数组进行优化：**在清空一个数组时，最简单的方法就是给其赋值为[ ]，但是与此同时会创建一个新的空对象，可以将数组的长度设置为0，以此来达到清空数组的目的。
+- **对数组进行优化**：在清空一个数组时，最简单的方法就是给其赋值为[ ]，但是与此同时会创建一个新的空对象，可以将数组的长度设置为0，以此来达到清空数组的目的。
 - **对**`object`**进行优化：**对象尽量复用，对于不再使用的对象，就将其设置为null，尽快被回收。
-- **对函数进行优化：**在循环中的函数表达式，如果可以复用，尽量放在函数的外面。
+- **对函数进行优化**：在循环中的函数表达式，如果可以复用，尽量放在函数的外面。
 
 ### 2. 哪些情况会导致内存泄漏
 
 以下四种情况会造成内存的泄漏：
 
-- **意外的全局变量：**由于使用未声明的变量，而意外的创建了一个全局变量，而使这个变量一直留在内存中无法被回收。
-- **被遗忘的计时器或回调函数：**设置了 setInterval 定时器，而忘记取消它，如果循环函数有对外部变量的引用的话，那么这个变量会被一直留在内存中，而无法被回收。
-- **脱离 DOM 的引用：**获取一个 DOM 元素的引用，而后面这个元素被删除，由于一直保留了对这个元素的引用，所以它也无法被回收。
-- **闭包：**不合理的使用闭包，从而导致某些变量一直被留在内存当中。
+- **意外的全局变量**：由于使用未声明的变量，而意外的创建了一个全局变量，而使这个变量一直留在内存中无法被回收。
+- **被遗忘的计时器或回调函数**：设置了 setInterval 定时器，而忘记取消它，如果循环函数有对外部变量的引用的话，那么这个变量会被一直留在内存中，而无法被回收。
+- **脱离 DOM 的引用**：获取一个 DOM 元素的引用，而后面这个元素被删除，由于一直保留了对这个元素的引用，所以它也无法被回收。
+- **闭包**：不合理的使用闭包，从而导致某些变量一直被留在内存当中。
