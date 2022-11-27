@@ -24,6 +24,10 @@ module.exports = {
                         text: '吐血整理八股',
                         link: "/allStart/"
                     },
+                    {
+                        text: '源码系列',
+                        link: "/sourceCode/"
+                    },
 					{
                         text: '基础',
                         link: "/base/"
@@ -87,7 +91,10 @@ module.exports = {
                         'Vue',
                         'Vue优化',
                         'LeetCode'
-
+                    ],
+                    '/sourceCode/':[
+                        '',
+                        'Vue3',
                     ],
 					'/base/': [
                         // '',
