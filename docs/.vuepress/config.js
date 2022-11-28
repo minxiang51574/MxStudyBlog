@@ -36,10 +36,10 @@ module.exports = {
                         text: '进阶',
                         link: "/improve/"
                     },
-                    {
-                        text:'手写',
-                        link:'/write/',
-                    },
+                    // {
+                    //     text:'手写',
+                    //     link:'/write/',
+                    // },
                     {
                         text:'Vue',
                         link:'/vue/'
@@ -115,13 +115,13 @@ module.exports = {
                     // '/webpack/':[
                     //     ''
                     // ],
-                    '/write/':[ 
-                        ''
-                    ],
+                    // '/write/':[ 
+                    //     ''
+                    // ],
                     '/vue/': [
                         '',
                         'Vuex',
-                        'Vue33',
+                        'Vue3',
                         'Vite'
                     ],
                     '/vueBase/': [
