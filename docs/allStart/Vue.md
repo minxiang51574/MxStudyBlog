@@ -1,14 +1,13 @@
 
 # 七、Vue
-![Vue面试题.png](https://cdn.nlark.com/yuque/0/2021/png/1500604/1621612367141-93b24efc-8b06-4c10-8259-586cd8c6c5d5.png?x-oss-process=image%2Fresize%2Cw_1038)
+![Vue面试题.png](../images/vueTest.png)
 
 ## 一、Vue 基础
 
-### 1. Vue的基本原理
+### 1. Vue的基本原理 
 
 当一个Vue实例创建时，Vue会遍历data中的属性，用 Object.defineProperty（vue3.0使用proxy ）将它们转为 getter/setter，并且在内部追踪相关依赖，在属性被访问和修改时通知变化。 每个组件实例都有相应的 watcher 程序实例，它会在组件渲染的过程中把属性记录为依赖，之后当依赖项的setter被调用时，会通知watcher重新计算，从而致使它关联的组件得以更新。
 
-![0_tB3MJCzh_cB6i3mS-1.png](https://cdn.nlark.com/yuque/0/2021/png/1500604/1620128979608-f7465ffc-9411-43e3-a6bc-96ab44dd77df.png)
 
 ### 2. 双向数据绑定的原理
 
@@ -19,7 +18,13 @@ Vue.js 是采用**数据劫持**结合**发布者-订阅者模式**的方式，�
 3. Watcher订阅者是Observer和Compile之间通信的桥梁，主要做的事情是: ①在自身实例化时往属性订阅器(dep)里面添加自己 ②自身必须有一个update()方法 ③待属性变动dep.notice()通知时，能调用自身的update()方法，并触发Compile中绑定的回调，则功成身退。
 4. MVVM作为数据绑定的入口，整合Observer、Compile和Watcher三者，通过Observer来监听自己的model数据变化，通过Compile来解析编译模板指令，最终利用Watcher搭起Observer和Compile之间的通信桥梁，达到数据变化 -> 视图更新；视图交互变化(input) -> 数据model变更的双向绑定效果。
 
-![image](https://cdn.nlark.com/yuque/0/2021/png/1500604/1618656573096-ebdc520c-5d60-4d12-ad04-5df4ebbb5fe7.png)
+![dd](../vue-model.jpg)
+
+**vue中几个核心类**
+- 1.Observe数据监听器：对data里的属性添加getter/setter，进行**依赖收集**以及**派发更新**。
+- 2.Dep消息订阅器：用于收集当前响应式对象的依赖关系，每个响应式对象都有一个dep实例。dep.subs=watcher[]，当数据发生变化时，触发dep.notify，该方法会遍历subs数组，调用每一个watcher的update方法。
+- 3.Watcher观察者：作为连接 Observer 和 Compile 的桥梁，能够订阅并收到每个属性变动的通知Watcher类有多种，比如computed watcher，user watcher(自己在watch里定义的需要监听数据变化的watcher)。
+- 4.Compile指令解析器：它的作用对每个元素节点的指令进行扫描和解析，根据指令模板替换数据，以及绑定相应的更新函数。
 
 ### 3. 使用 Object.defineProperty() 来进行数据劫持有什么缺点？
 
@@ -43,7 +48,7 @@ MVC、MVP 和 MVVM 是三种常见的软件架构设计模式，主要通过分�
 
 MVC 通过分离 Model、View 和 Controller 的方式来组织代码结构。其中 View 负责页面的显示逻辑，Model 负责存储页面的业务数据，以及对相应数据的操作。并且 View 和 Model 应用了观察者模式，当 Model 层发生改变的时候它会通知有关 View 层更新页面。Controller 层是 View 层和 Model 层的纽带，它主要负责用户与应用的响应操作，当用户与页面产生交互的时候，Controller 中的事件触发器就开始工作了，通过调用 Model 层，来完成对 Model 的修改，然后 Model 层再去通知 View 层更新。
 
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603814137582-5a9aa62f-0045-4272-bef0-447dedb25596.png)
+![image.png](../images/mvc.png)
 
 （2）MVVM
 
@@ -61,7 +66,7 @@ Model和View并无直接关联，而是通过ViewModel来进行联系的，Model
 
 这种模式实现了 Model和View的数据自动同步，因此开发者只需要专注于数据的维护操作即可，而不需要自己操作DOM。
 
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603814104939-8c8ac923-735d-4476-937a-cb1f795ffe84.png)
+![image.png](../images/MVVM.png)
 
 **（3）MVP**
 
@@ -69,7 +74,7 @@ MVP 模式与 MVC 唯一不同的在于 Presenter 和 Controller。在 MVC 模�
 
 ### 5. Computed 和 Watch 的区别
 
-**对于Computed：**
+**对于Computed**：
 
 - 它支持缓存，只有依赖的数据发生了变化，才会重新计算
 - 不支持异步，当Computed中有异步操作时，无法监听数据的变化
@@ -79,7 +84,7 @@ MVP 模式与 MVC 唯一不同的在于 Presenter 和 Controller。在 MVC 模�
 
 
 
-**对于Watch：**
+**对于Watch**：
 
 - 它不支持缓存，数据变化时，它就会触发相应的操作
 - 支持异步监听
@@ -148,7 +153,7 @@ slot又名插槽，是Vue的内容分发机制，组件内部的模板引擎使�
 
 例如，在显示金额，给商品价格添加单位：
 
-```
+```js
 <li>商品价格：{{item.price | filterPrice}}</li>
 
  filters: {
@@ -233,7 +238,7 @@ slot又名插槽，是Vue的内容分发机制，组件内部的模板引擎使�
 
 被包裹在keep-alive中的组件的状态将会被保留：
 
-```
+```js
 <keep-alive>
     <router-view v-if="$route.meta.keepAlive"></router-view>
 </kepp-alive>
@@ -241,7 +246,7 @@ slot又名插槽，是Vue的内容分发机制，组件内部的模板引擎使�
 
 **router.js**
 
-```
+```js
 {
   path: '/',
   name: 'xxx',
@@ -280,7 +285,7 @@ slot又名插槽，是Vue的内容分发机制，组件内部的模板引擎使�
 
 动态绑定了 input 的 value 指向了 messgae 变量，并且在触发 input 事件的时候去动态把 message设置为目标值：
 
-```
+```js
 <input v-model="sth" />
 //  等同于
 <input 
@@ -302,7 +307,7 @@ slot又名插槽，是Vue的内容分发机制，组件内部的模板引擎使�
 
 **本质是一个父子组件通信的语法糖，通过prop和$.emit实现。**因此父组件 v-model 语法糖本质上可以修改为：
 
-```
+```js
 <child :value="message"  @input="function(e){message = e}"></child>
 ```
 
@@ -310,7 +315,7 @@ slot又名插槽，是Vue的内容分发机制，组件内部的模板引擎使�
 
 例子：
 
-```
+```js
 // 父组件
 <aa-input v-model="aa"></aa-input>
 // 等价于
@@ -333,13 +338,13 @@ methods:{
 
 可以。v-model 实际上是一个语法糖，如：
 
-```
+```js
 <input v-model="searchText">
 ```
 
 实际上相当于：
 
-```
+```js
 <input
   v-bind:value="searchText"
   v-on:input="searchText = $event.target.value"
@@ -348,13 +353,13 @@ methods:{
 
 用在自定义组件上也是同理：
 
-```
+```js
 <custom-input v-model="searchText">
 ```
 
 相当于：
 
-```
+```js
 <custom-input
   v-bind:value="searchText"
   v-on:input="searchText = $event"
@@ -368,7 +373,7 @@ methods:{
 
 所以，custom-input 组件的实现应该类似于这样：
 
-```
+```js
 Vue.component('custom-input', {
   props: ['value'],
   template: `
@@ -421,7 +426,7 @@ keep-alive有以下三个属性：
 
 **（2）keep-alive 的实现**
 
-```
+```js
 const patternTypes: Array<Function> = [String, RegExp, Array] // 接收：字符串，正则，数组
 
 export default {
@@ -460,13 +465,13 @@ export default {
 }
 ```
 
-**render函数：**
+**render函数**：
 
 1. 会在 keep-alive 组件内部去写自己的内容，所以可以去获取默认 slot 的内容，然后根据这个去获取组件
 2. keep-alive 只对第一个组件有效，所以获取第一个子组件。
 3. 和 keep-alive 搭配使用的一般有：动态组件 和router-view
 
-```
+```js
 render () {
   //
   function getFirstComponentChild (children: ?Array<VNode>): ?VNode {
@@ -558,7 +563,7 @@ keep-alive 具体是通过 cache 数组缓存所有组件的 vnode 实例。当 
 
 - 组件的首次渲染∶判断组件的 abstract 属性，才往父组件里面挂载 DOM
 
-```
+```js
 // core/instance/lifecycle
 function initLifecycle (vm: Component) {
   const options = vm.$options
@@ -589,7 +594,7 @@ function initLifecycle (vm: Component) {
 
 - 判断当前 keepAlive 和 componentInstance 是否存在来判断是否要执行组件 prepatch 还是执行创建 componentlnstance
 
-```
+```js
 // core/vdom/create-component
 init (vnode: VNodeWithData, hydrating: boolean): ?boolean {
     if (
@@ -651,7 +656,7 @@ Vue采用了数据驱动视图的思想，但是在一些情况下，仍然需�
 
 由于Vue的DOM操作是异步的，所以，在上面的情况中，就要将DOM2获取数据的操作写在`$nextTick`中。
 
-```
+```js
 this.$nextTick(() => {
     // 获取数据的操作...
 })
@@ -668,7 +673,7 @@ this.$nextTick(() => {
 
 ### **19. Vue 中给 data 中的对象属性添加一个新的属性时会发生什么？如何解决？**
 
-```
+```js
 <template> 
    <div>
       <ul>
@@ -699,7 +704,7 @@ this.$nextTick(() => {
 
 点击 button 会发现，obj.b 已经成功添加，但是视图并未刷新。这是因为在Vue实例创建时，obj.b并未声明，因此就没有被Vue转换为响应式的属性，自然就不会触发视图的更新，这时就需要使用Vue的全局 api **$set()：**
 
-```
+```js 
 addObjB () (
    this.$set(this.obj, 'b', 'obj.b')
    console.log(this.obj)
@@ -712,11 +717,11 @@ $set()方法相当于手动的去把obj.b处理成一个响应式的属性，此
 
 在Vue中，对响应式处理利用的是Object.defineProperty对数据进行拦截，而这个方法并不能监听到数组内部变化，数组长度变化，数组的截取变化等，所以需要对这些操作进行hack，让Vue能监听到其中的变化。
 
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/1500604/1604019269329-d88e91cf-b33d-4b2d-b014-e5739e9b7dbc.png)
+![image.png](../images/vueArr.png)
 
 那Vue是如何实现让这些数组方法实现元素的实时更新的呢，下面是Vue中对这些方法的封装：
 
-```
+```js
 // 缓存数组原型
 const arrayProto = Array.prototype;
 // 实现 arrayMethods.__proto__ === Array.prototype
@@ -778,7 +783,7 @@ methodsToPatch.forEach(function(method) {
 
 **区别：**
 
-![775316ebb4c727f7c8771cc2c06e06dd.jpg](https://cdn.nlark.com/yuque/0/2021/jpeg/1500604/1609521413572-54d0bd0f-8ed6-4438-997a-c890e4cd9c5e.jpeg)
+![775316ebb4c727f7c8771cc2c06e06dd.jpg](../images/spa.jpg)
 
 ### 22. Vue template 到 render 的过程
 
@@ -788,7 +793,7 @@ vue的模版编译过程主要如下：**template -> ast -> render函数**
 
 vue 在模版编译版本的码中会执行 compileToFunctions 将template转化为render函数：
 
-```
+```js
 // 将模板编译为render函数
 const { render, staticRenderFns } = compileToFunctions(template,options//省略}, this)
 ```
@@ -797,7 +802,7 @@ CompileToFunctions中的主要逻辑如下∶
 
 **（1）调用parse方法将template转化为ast（抽象语法树）**
 
-```
+```js
 constast = parse(template.trim(), options)
 ```
 
@@ -810,7 +815,7 @@ AST元素节点总共三种类型：type为1表示普通元素、2为表达式�
 
 **（2）对静态节点做优化**
 
-```
+```js
 optimize(ast,options)
 ```
 
@@ -824,7 +829,7 @@ optimize(ast,options)
 
 **（3）生成代码**
 
-```
+```js
 const code = generate(ast, options)
 ```
 
@@ -847,14 +852,14 @@ mixin 和 extends均是用于合并、拓展组件的，两者均通过 mergeOpt
 - mixins 接收一个混入对象的数组，其中混入对象可以像正常的实例对象一样包含实例选项，这些选项会被合并到最终的选项中。Mixin 钩子按照传入顺序依次调用，并在调用组件自身的钩子之前被调用。
 - extends 主要是为了便于扩展单文件组件，接收一个对象或构造函数。
 
-![bb253b1d177f421741af0e7dd0f52b5e.jpg](https://cdn.nlark.com/yuque/0/2021/jpeg/1500604/1609518480272-8cb1af01-a4a8-4d54-91bb-5546aafac510.jpeg?x-oss-process=image%2Fresize%2Cw_1500)
+![bb253b1d177f421741af0e7dd0f52b5e.jpg](../images/mixin.jpg)
 
 **（2）mergeOptions 的执行过程**
 
 - 规范化选项（normalizeProps、normalizelnject、normalizeDirectives)
 - 对未合并的选项，进行判断
 
-```
+```js
 if(!child._base) {
     if(child.extends) {
         parent = mergeOptions(parent, child.extends, vm)
@@ -951,7 +956,7 @@ Vue提倡单向数据流，即父级 props 的更新会流向子组件，但是�
 
 在初始化 Vue 的每个组件时，会对组件的 data 进行初始化，就会将由普通对象变成响应式对象，在这个过程中便会进行依赖收集的相关逻辑，如下所示∶
 
-```
+```js
 function defieneReactive (obj, key, val){
   const dep = new Dep();
   ...
@@ -975,7 +980,7 @@ function defieneReactive (obj, key, val){
 
 Dep是整个依赖收集的核心，其关键代码如下：
 
-```
+```js
 class Dep {
   static target;
   subs;
@@ -1008,7 +1013,7 @@ Dep 是一个 class ，其中有一个关 键的静态属性 static，它指向�
 
 **（2）Watcher**
 
-```
+```js
 class Watcher {
   getter;
   ...
@@ -1044,7 +1049,7 @@ Watcher 是一个 class，它定义了一些方法，其中和依赖收集相关
 
 初始化最终会走 mount 过程，其中会实例化 Watcher ，进入 Watcher 中，便会执行 this.get() 方法，
 
-```
+```js
 updateComponent = () => {
   vm._update(vm._render())
 }
@@ -1155,14 +1160,14 @@ react可以通过高阶组件（HOC）来扩展，而Vue需要通过mixins来扩
 
 - this.$set(你要改变的数组/对象，你要改变的位置/key，你要改成什么value)
 
-```
+```js
 this.$set(this.arr, 0, "OBKoro1"); // 改变数组
 this.$set(this.obj, "c", "OBKoro1"); // 改变对象
 ```
 
 - 调用以下几个数组的方法
 
-```
+```js
 splice()、 push()、pop()、shift()、unshift()、sort()、reverse()
 ```
 
@@ -1288,7 +1293,7 @@ SPA（ single-page application ）仅在 Web 页面初始化时加载相应的 H
 
 首先：在css里加上以下代码：
 
-```
+```js
 [v-cloak] {
     display: none;
 }
@@ -1300,7 +1305,7 @@ SPA（ single-page application ）仅在 Web 页面初始化时加载相应的 H
 
 这个 API 很少用到，作用是扩展组件生成一个构造器，通常会与 `$mount` 一起使用。
 
-```
+```js
 // 创建组件构造器
 let Component = Vue.extend({
   template: '<div>test</div>'
@@ -1321,7 +1326,7 @@ new SuperComponent().$mount('#app')
 
 `mixin` 用于全局混入，会影响到每个组件实例，通常插件都是这样做初始化的。
 
-```
+```js
 Vue.mixin({
     beforeCreate() {
         // ...逻辑
@@ -1463,7 +1468,7 @@ keep-alive是 Vue 提供的一个内置组件，用来对组件进行缓存—�
 - `props` 可以显示定义一个或一个以上的数据，对于接收的数据，可以是各种数据类型，同样也可以传递一个函数。
 - `props`属性名规则：若在`props`中使用驼峰形式，模板中需要使用短横线的形式
 
-```
+```js
 // 父组件
 <template>
     <div id="father">
@@ -1490,7 +1495,7 @@ export default {
 </script>
 ```
 
-```
+```js
 // 子组件
 <template>
     <div id="son">
@@ -1512,7 +1517,7 @@ export default {
 
 
 
-```
+```js
 // 父组件
 <template>
   <div class="section">
@@ -1541,7 +1546,7 @@ export default {
 </script>
 ```
 
-```
+```js
 // 父组件
 <template>
   <div class="section">
@@ -1570,7 +1575,7 @@ export default {
 </script>
 ```
 
-```
+```js
 //子组件
 <template>
   <div>
@@ -1596,7 +1601,7 @@ export default {
 
 **（1）创建事件中心管理组件之间的通信**
 
-```
+```js
 // event-bus.js
 
 import Vue from 'vue'
@@ -1607,7 +1612,7 @@ export const EventBus = new Vue()
 
 假设有两个兄弟组件`firstCom`和`secondCom`：
 
-```
+```js
 <template>
   <div>
     <first-com></first-com>
@@ -1626,7 +1631,7 @@ export default {
 
 在`firstCom`组件中发送事件：
 
-```
+```js
 <template>
   <div>
     <button @click="add">加法</button>    
@@ -1657,7 +1662,7 @@ export default {
 
 在`secondCom`组件中发送事件：
 
-```
+```js
 <template>
   <div>求和: {{count}}</div>
 </template>
@@ -1700,7 +1705,7 @@ export default {
 
 在父组件中：
 
-```
+```js
 provide() {
  return {
     num: this.num
@@ -1710,13 +1715,13 @@ provide() {
 
 在子组件中：
 
-```
+```js
 inject: ['num']
 ```
 
 还可以这样写，这样写就可以访问父组件中的所有属性：
 
-```
+```js
 provide() {
  return {
     app: this
@@ -1746,7 +1751,7 @@ console.log(this.app.num)
 
 在子组件中：
 
-```
+```js
 export default {
   data () {
     return {
@@ -1763,7 +1768,7 @@ export default {
 
 在父组件中：
 
-```
+```js
 <template>
   <child ref="child"></component-a>
 </template>
@@ -1788,7 +1793,7 @@ export default {
 
 在子组件中：
 
-```
+```js
 <template>
   <div>
     <span>{{message}}</span>
@@ -1814,7 +1819,7 @@ export default {
 
 在父组件中：
 
-```
+```js
 // 父组件中
 <template>
   <div class="hello_world">
@@ -1875,7 +1880,7 @@ export default {
 
 A组件（`APP.vue`）：
 
-```
+```js
 <template>
     <div id="app">
         //此处监听了两个事件，可以在B组件或者C组件中直接触发 
@@ -1900,7 +1905,7 @@ export default {
 
 B组件（`Child1.vue`）：
 
-```
+```js
 <template>
     <div class="child-1">
         <p>props: {{pChild1}}</p>
@@ -1923,7 +1928,7 @@ export default {
 
 C 组件 (`Child2.vue`)：
 
-```
+```js
 <template>
     <div class="child-2">
         <p>props: {{pChild2}}</p>
@@ -1973,7 +1978,7 @@ export default {
 
 非懒加载：
 
-```
+```js
 import List from '@/components/list.vue'
 const router = new VueRouter({
   routes: [
@@ -1984,7 +1989,7 @@ const router = new VueRouter({
 
 （1）方案一(常用)：使用箭头函数+import动态加载
 
-```
+```js
 const List = () => import('@/components/list.vue')
 const router = new VueRouter({
   routes: [
@@ -1995,7 +2000,7 @@ const router = new VueRouter({
 
 （2）方案二：使用箭头函数+require动态加载
 
-```
+```js
 const router = new Router({
   routes: [
    {
@@ -2008,7 +2013,7 @@ const router = new Router({
 
 （3）方案三：使用webpack的require.ensure技术，也可以实现按需加载。 这种情况下，多个路由指定相同的chunkName，会合并打包成一个js文件。
 
-```
+```js
 // r就是resolve
 const List = r => require.ensure([], () => r(require('@/components/list')), 'list');
 // 路由也是正常的写法  这种是官方推荐的写的 按模块划分懒加载 
@@ -2035,7 +2040,7 @@ Vue-Router有两种模式：**hash模式**和**history模式**。默认的路由
 
 **原理：** hash模式的主要原理就是**onhashchange()事件**：
 
-```
+```js
 window.onhashchange = function(event){
     console.log(event.oldURL, event.newURL);
     let hash = location.hash.slice(1);
@@ -2061,7 +2066,7 @@ window.onhashchange = function(event){
 
 如果想要切换到history模式，就要进行以下配置（后端也要进行配置）：
 
-```
+```js
 const router = new VueRouter({
   mode: 'history',
   routes: [...]
@@ -2086,7 +2091,7 @@ hash模式和history模式都有各自的优势和缺陷，还是要根据实际
 
 **（1）监听$route的变化**
 
-```
+```js
 // 监听,当路由发生变化的时候执行
 watch: {
   $route: {
@@ -2120,7 +2125,7 @@ window.location.hash 的值可读可写，读取来判断状态是否改变，�
 
 1）路由定义
 
-```
+```js
 //在APP.vue中
 <router-link :to="'/user/'+userId" replace>用户</router-link>    
 
@@ -2133,7 +2138,7 @@ window.location.hash 的值可读可写，读取来判断状态是否改变，�
 
 2）路由跳转
 
-```
+```js
 // 方法1：
 <router-link :to="{ name: 'users', params: { uname: wade }}">按钮</router-link
 
@@ -2158,7 +2163,7 @@ this.$router.push('/user/' + wade)
 
 1）路由定义
 
-```
+```js
 //方式1：直接在router-link 标签上以对象的形式
 <router-link :to="{path:'/profile',query:{name:'why',age:28,height:188}}">档案</router-link>
 
@@ -2179,7 +2184,7 @@ profileClick(){
 
 2）跳转方法
 
-```
+```js
 // 方法1：
 <router-link :to="{ name: 'users', query: { uname: james }}">按钮</router-link>
 
@@ -2198,7 +2203,7 @@ this.$router.push('/user?uname=' + jsmes)
 
 3）获取参数
 
-```
+```js
 通过$route.query 获取传递的值
 ```
 
@@ -2222,7 +2227,7 @@ vue-router全局有三个路由钩子;
 
 -  beforeEach（判断是否登录了，没登录就跳转到登录页）
 
-```
+```js
 router.beforeEach((to, from, next) => {  
     let ifInfo = Vue.prototype.$common.getSession('userData');  // 判断是否登录的存储信息
     if (!ifInfo) { 
@@ -2243,7 +2248,7 @@ router.beforeEach((to, from, next) => {
 
 - afterEach （跳转之后滚动条回到顶部）
 
-```
+```js
 router.afterEach((to, from) => {  
     // 跳转之后滚动条回到顶部  
     window.scrollTo(0,0);
@@ -2256,7 +2261,7 @@ router.afterEach((to, from) => {
 
 如果不想全局配置守卫的话，可以为某些路由单独配置守卫，有三个参数∶ to、from、next
 
-```
+```js
 export default [    
     {        
         path: '/',        
@@ -2284,7 +2289,7 @@ beforeRouteUpdate、beforeRouteEnter、beforeRouteLeave
 
 注意点，beforeRouteEnter组件内还访问不到this，因为该守卫执行前组件实例还没有被创建，需要传一个回调给 next来访问，例如：
 
-```
+```js
 beforeRouteEnter(to, from, next) {      
     next(target => {        
         if (from.path == '/classProcess') {          
@@ -2420,7 +2425,7 @@ Vuex 是一个专为 Vue.js 应用程序开发的状态管理模式。每一个 
 - Vuex 的状态存储是响应式的。当 Vue 组件从 store 中读取状态的时候，若 store 中的状态发生变化，那么相应的组件也会相应地得到高效更新。
 - 改变 store 中的状态的唯一途径就是显式地提交 (commit) mutation。这样可以方便地跟踪每一个状态的变化。
 
-![b025e120ca3d0bd2ded3d038d58cacf4.jpg](https://cdn.nlark.com/yuque/0/2021/jpeg/1500604/1609522434579-ff590978-32e1-4cf5-bbbd-d8caf932f8d6.jpeg)
+![b025e120ca3d0bd2ded3d038d58cacf4.jpg](../images/vuex.jpg)
 
 Vuex为Vue Components建立起了一个完整的生态圈，包括开发中的API调用一环。 
 
@@ -2447,7 +2452,7 @@ Vuex为Vue Components建立起了一个完整的生态圈，包括开发中的AP
 
 mutation中的操作是一系列的同步函数，用于修改state中的变量的的状态。当使用vuex时需要通过commit来提交需要操作的内容。mutation 非常类似于事件：每个 mutation 都有一个字符串的 事件类型 (type) 和 一个 回调函数 (handler)。这个回调函数就是实际进行状态更改的地方，并且它会接受 state 作为第一个参数：
 
-```
+```js
 const store = new Vuex.Store({
   state: {
     count: 1
@@ -2462,7 +2467,7 @@ const store = new Vuex.Store({
 
 当触发一个类型为 increment 的 mutation 时，需要调用此函数：
 
-```
+```js
 store.commit('increment')
 ```
 
@@ -2471,7 +2476,7 @@ store.commit('increment')
 - Action 可以包含任意异步操作。
 - Action 提交的是 mutation，而不是直接变更状态。
 
-```
+```js
 const store = new Vuex.Store({
   state: {
     count: 0
@@ -2582,7 +2587,7 @@ Action 函数接受一个与 store 实例具有相同方法和属性的 context 
 
 在Vuex.Store 构造器选项中开启,如下
 
-```
+```js
 const store = new Vuex.Store({
     strict:true,
 })
@@ -2592,7 +2597,7 @@ const store = new Vuex.Store({
 
 使用mapGetters辅助函数, 利用对象展开运算符将getter混入computed 对象中
 
-```
+```js
 import {mapGetters} from 'vuex'
 export default{
     computed:{
@@ -2605,7 +2610,7 @@ export default{
 
 使用mapMutations辅助函数,在组件中这么使用
 
-```
+```js
 import { mapMutations } from 'vuex'
 methods:{
     ...mapMutations({
@@ -2708,7 +2713,7 @@ Vue3 使用 Proxy 来监控数据的变化。Proxy 是 ES6 中提供的功能，
 
 如下，是一个使用了 Vue Composition API 的 Vue3 组件：
 
-```
+```js
 <template>
   <button @click="increment">
     Count: {{ count }}
