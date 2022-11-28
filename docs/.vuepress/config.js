@@ -121,7 +121,7 @@ module.exports = {
                     '/vue/': [
                         '',
                         'Vuex',
-                        'Vue3',
+                        'Vue33',
                         'Vite'
                     ],
                     '/vueBase/': [
