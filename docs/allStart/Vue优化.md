@@ -33,7 +33,7 @@ watch： 更多的是「观察」的作用，类似于某些数据的监听回�
 v-for 比 v-if 优先级高，如果每一次都需要遍历整个数组，将会影响速度，尤其是当之需要渲染很小一部分的时候，必要情况下应该替换成 computed 属性。
 
 推荐：
-```
+```js
 <ul>
   <li
     v-for="user in activeUsers"
@@ -50,7 +50,7 @@ computed: {
 }
 ```
 不推荐：
-```
+```js
 <ul>
   <li
     v-for="user in users"
@@ -63,7 +63,7 @@ computed: {
 **1.4、长列表性能优化**
 
 Vue 会通过 Object.defineProperty 对数据进行劫持，来实现视图响应数据的变化，然而有些时候我们的组件就是纯粹的数据展示，不会有任何改变，我们就不需要 Vue 来劫持我们的数据，在大量数据展示的情况下，这能够很明显的减少组件初始化的时间，那如何禁止 Vue 劫持我们的数据呢？可以通过 Object.freeze 方法来冻结一个对象，一旦被冻结的对象就再也不能被修改了。
-```
+```js
 export default {
   data: () => ({
     users: {}
@@ -77,7 +77,7 @@ export default {
 **1.5、事件的销毁**
 
 Vue 组件销毁时，会自动清理它与其它实例的连接，解绑它的全部指令及事件监听器，但是仅限于组件本身的事件。如果在 js 内
-```
+```js
 created() {
   addEventListener('click', this.click, false)
 },
@@ -91,22 +91,22 @@ beforeDestroy() {
 
 （1）安装插件
 
-```
+```js
     npm install vue-lazyload --save-dev
 ```
 （2）在入口文件 man.js 中引入并使用
 
-```
+```js
 import VueLazyload from 'vue-lazyload'
 ```
 然后再 vue 中直接使用
 
 
-```
+```js
 Vue.use(VueLazyload)
 ```
 或者添加自定义选项
-```
+```js
 Vue.use(VueLazyload, {
 preLoad: 1.3,
 error: 'dist/error.png',
@@ -125,7 +125,7 @@ attempt: 1
 Vue  是单页面应用，可能会有很多的路由引入 ，这样使用 webpcak 打包后的文件很大，当进入首页时，加载的资源过多，页面会出现白屏的情况，不利于用户体验。如果我们能把不同路由对应的组件分割成不同的代码块，然后当路由被访问的时候才加载对应的组件，这样就更加高效了。这样会大大提高首屏显示的速度，但是可能其他的页面的速度就会降下来。
 
 路由懒加载：
-```
+```js
 const Foo = () => import('./Foo.vue')
 const router = new VueRouter({
   routes: [
@@ -140,11 +140,11 @@ const router = new VueRouter({
 （1）首先，安装 babel-plugin-component ：
 
 
-```
+```js
 npm install babel-plugin-component -D
 ```
 （2）然后，将 .babelrc 修改为：
-```
+```js
 {
   "presets": [["es2015", { "modules": false }]],
   "plugins": [
@@ -159,7 +159,7 @@ npm install babel-plugin-component -D
 }
 ```
 （3）在 main.js 中引入部分组件：
-```
+```js
 import Vue from 'vue';
 import { Button, Select } from 'element-ui';
 
@@ -197,11 +197,11 @@ import { Button, Select } from 'element-ui';
 在 vue 项目中除了可以在 webpack.base.conf.js 中 url-loader 中设置 limit 大小来对图片处理，对小于 limit 的图片转化为 base64 格式，其余的不做操作。所以对有些较大的图片资源，在请求资源的时候，加载会很慢，我们可以用 image-webpack-loader来压缩图片：
 
 （1）首先，安装 image-webpack-loader  ：
-```
+```js
 npm install image-webpack-loader --save-dev
 ```
 （2）然后，在 webpack.base.conf.js  中进行配置：
-```
+```js
 {
   test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
   use:[
@@ -223,13 +223,13 @@ npm install image-webpack-loader --save-dev
 ```
 2.2、减少 ES6 转为 ES5 的冗余代码
 Babel 插件会在将 ES6 代码转换成 ES5 代码时会注入一些辅助函数，例如下面的 ES6 代码：
-```
+```js
 class HelloWebpack extends Component{...}
 ```
 这段代码再被转换成能正常运行的 ES5 代码时需要以下两个辅助函数：
 
 
-```
+```js
 babel-runtime/helpers/createClass  // 用于实现 class 语法
 babel-runtime/helpers/inherits  // 用于实现 extends 语法
 ```
@@ -238,11 +238,11 @@ babel-runtime/helpers/inherits  // 用于实现 extends 语法
 （1）首先，安装 babel-plugin-transform-runtime ：
 
 
-```
+```js
 npm install babel-plugin-transform-runtime --save-dev
 ```
 （2）然后，修改 .babelrc  配置文件为：
-```
+```js
 "plugins": [
     "transform-runtime"
 ]
@@ -260,7 +260,7 @@ npm install babel-plugin-transform-runtime --save-dev
 所以我们需要将多个页面的公共代码抽离成单独的文件，来优化以上问题 。Webpack 内置了专门用于提取多个Chunk 中的公共部分的插件 CommonsChunkPlugin，我们在项目中 CommonsChunkPlugin 的配置如下：
 
 // 所有在 package.json 里面依赖的包，都会被打包进 vendor.js 这个文件中。
-```
+```js
 new webpack.optimize.CommonsChunkPlugin({
   name: 'vendor',
   minChunks: function(module, count) {
@@ -328,7 +328,7 @@ eval-source-map：eval 打包代码的速度非常快，因为它不生成 map �
 Webpack 输出的代码可读性非常差而且文件非常大，让我们非常头疼。为了更简单、直观地分析输出结果，社区中出现了许多可视化分析工具。这些工具以图形的方式将结果更直观地展示出来，让我们快速了解问题所在。接下来讲解我们在 Vue 项目中用到的分析工具：webpack-bundle-analyzer 。
 
 我们在项目中 webpack.prod.conf.js 进行配置：
-```
+```js
 if (config.build.bundleAnalyzerReport) {
   var BundleAnalyzerPlugin =   require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
   webpackConfig.plugins.push(new BundleAnalyzerPlugin());
@@ -355,7 +355,7 @@ gzip 是 GNUzip 的缩写，最早用于 UNIX 系统的文件压缩。HTTP 协�
 
 npm install compression --save
 添加代码逻辑：
-```
+```js
 var compression = require('compression');
 var app = express();
 app.use(compression())
