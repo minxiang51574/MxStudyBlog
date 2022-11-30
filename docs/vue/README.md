@@ -1,684 +1,205 @@
-# Vue2
+# Vue2基础
+##  1.Vue.js是什么
+Vue.js（是一套构建用户界面的 渐进式框架。与其他重量级框架不同的是，Vue 采用自底向上增量开发的设计。Vue 的核心库只关注视图层，并且非常容易学习，非常容易与其它库或已有项目整合。另一方面，Vue 完全有能力驱动采用单文件组件和Vue生态系统支持的库开发的复杂单页应用。Vue.js 的目标是通过尽可能简单的 API 实现响应的数据绑定和组合的视图组件
 
-## 1、Vue的构造函数
-- instance/index.js 真正的Vue的构造函数,并在Vue的原型上扩展方法
-- core/index.js 增加全局API方法
-- runtime/index.js 扩展$mount方法及平台对应的代码
-![dd](../vueFn.png)
-## 2、vue中几个核心类
-- 1.Observe数据监听器：对data里的属性添加getter/setter，进行**依赖收集**以及**派发更新**。
-- 2.Dep消息订阅器：用于收集当前响应式对象的依赖关系，每个响应式对象都有一个dep实例。dep.subs=watcher[]，当数据发生变化时，触发dep.notify，该方法会遍历subs数组，调用每一个watcher的update方法。
-- 3.Watcher观察者：作为连接 Observer 和 Compile 的桥梁，能够订阅并收到每个属性变动的通知Watcher类有多种，比如computed watcher，user watcher(自己在watch里定义的需要监听数据变化的watcher)。
-- 4.Compile指令解析器：它的作用对每个元素节点的指令进行扫描和解析，根据指令模板替换数据，以及绑定相应的更新函数。
+## 2.Vue.js特点
+- 数据驱动：自动计算属性和追踪依赖的模板表达式
+- 组件化：用可复用、解耦的组件来构造页面
+- 轻量：代码量小，不依赖其他库
+- 快速：精确有效批量DOM更新
 
+## 3.MVVM模式
+即Model-View-ViewModel
 
-## 3、双向数据绑定原理
+MVVM 由 Model,View,ViewModel 三部分构成，Model 层代表数据模型，也可以在Model中定义数据修改和操作的业务逻辑；View 代表UI 组件，它负责将数据模型转化成UI 展现出来，ViewModel 是一个同步View 和 Model的对象。
+
+在MVVM架构下，View 和 Model 之间并没有直接的联系，而是通过ViewModel进行交互，Model 和 ViewModel 之间的交互是双向的， 因此View 数据的变化会同步到Model中，而Model 数据的变化也会立即反应到View 上。
+
+ViewModel 通过双向数据绑定把 View 层和 Model 层连接了起来，而View 和 Model 之间的同步工作完全是自动的，无需人为干涉，因此开发者只需关注业务逻辑，不需要手动操作DOM, 不需要关注数据状态的同步问题，复杂的数据状态维护完全由 MVVM 来统一管理。
+
+## 4.vue 的双向绑定的原理
+vue.js 是采用数据劫持结合发布者-订阅者模式的方式，通过 Object.defineProperty()来劫持各个属性的 setter，getter，在数据变动时发布消息给订阅者，触发相应的监听回调。
+
 ![dd](../vue-model.jpg)
-### 依赖收集
-- initstate，对computed属性初始化时，触发computed watcher依赖收集
-- initstate，对监听属性初始化时，触发user watcher依赖收集
-- render，会触发render依赖收集
-
-### 派发更新 Object.defineProperty
-- 1.组件中对相应的数据发生了修改，会触发setter
-- 2.dep.notify
-- 3.遍历subs数组，调用每一个watcher的update方法
-
-### 过程 
-- 初始化阶段，一方面Vue 会遍历 data 选项中的属性，并用 Object.defineProperty 将它们转为 getter/setter，实现数据变化监听功能；另一方面，Vue 的指令编译器Compile 对元素节点的指令进行扫描和解析，初始化视图，并订阅Watcher 来更新视图， 此时Wather 会将自己添加到消息订阅器中(Dep),初始化完毕。
-- 当数据发生变化时，Observer 中的 setter 方法被触发，setter 会立即调用Dep.notify()，Dep 开始遍历所有的订阅者，并调用订阅者的 update 方法，订阅者收到通知后对视图进行相应的更新。
-
-### 代码
-```js
-// src/obserber/index.js
-class Observer {
-  // 观测值
-  constructor(value) {
-    this.walk(value);
-  }
-  walk(data) {
-    // 对象上的所有属性依次进行观测
-    let keys = Object.keys(data);
-    for (let i = 0; i < keys.length; i++) {
-      let key = keys[i];
-      let value = data[key];
-      defineReactive(data, key, value);
-    }
-  }
-}
-// Object.defineProperty数据劫持核心 兼容性在ie9以及以上
-function defineReactive(data, key, value) {
-  observe(value); // 递归关键
-  // --如果value还是一个对象会继续走一遍odefineReactive 层层遍历一直到value不是对象才停止
-  //   思考？如果Vue数据嵌套层级过深 >>性能会受影响
-  Object.defineProperty(data, key, {
-    get() {
-      console.log("获取值");
-      return value;
-    },
-    set(newValue) {
-      if (newValue === value) return;
-      console.log("设置值");
-      value = newValue;
-    },
-  });
-}
-export function observe(value) {
-  // 如果传过来的是对象或者数组 进行属性劫持
-  if (
-    Object.prototype.toString.call(value) === "[object Object]" ||
-    Array.isArray(value)
-  ) {
-    return new Observer(value);
-  }
-}
-
-```
-
-## 4、Object.defineProperty 缺点？
-- 不能监听数组的变化
-- 无法检测到对象新增或删除的属性
-- 必须遍历对象的每个属性、深层遍历嵌套的对象
-
-## 5、数组的观测
-
-- 1.因为对数组下标的拦截太浪费性能 对 Observer 构造函数传入的数据参数增加了数组的判断
-```js
-// src/obserber/index.js
-import { arrayMethods } from "./array";
-class Observer {
-  constructor(value) {
-    if (Array.isArray(value)) {
-      // 这里对数组做了额外判断
-      // 通过重写数组原型方法来对数组的七种方法进行拦截
-      value.__proto__ = arrayMethods;
-      // 如果数组里面还包含数组 需要递归判断
-      this.observeArray(value);
-    } else {
-      this.walk(value);
-    }
-  }
-  observeArray(items) {
-    for (let i = 0; i < items.length; i++) {
-      observe(items[i]);
-    }
-  }
-}
-
-```
-
-- 2.每个响应式数据增加了一个不可枚举的__ob__属性 并且指向了 Observer 实例
-  - 1.可以根据这个属性来防止已经被响应式观察的数据反复被观测
-  - 2.响应式数据可以使用__ob__来获取 Observer 实例的相关方法
-```js
-// src/obserber/index.js
-class Observer {
-  // 观测值 给每个value添加__ob__属性
-  constructor(value) {
-    Object.defineProperty(value, "__ob__", {
-      //  值指代的就是Observer的实例
-      value: this,
-      //  不可枚举
-      enumerable: false,
-      writable: true,
-      configurable: true,
-    });
-  }
-}
-```
-- 3.对数组原型重写
-
-```js
-// src/obserber/array.js
-// 先保留数组原型
-const arrayProto = Array.prototype;
-// 然后将arrayMethods继承自数组原型
-// 这里是面向切片编程思想（AOP）--不破坏封装的前提下，动态的扩展功能
-export const arrayMethods = Object.create(arrayProto);
-// 为什么重写七个方法？ 会改变原数组
-// 其它方法如何？join concat map filter forEach	reduce every somesome flat slice
-// value.__proto__  => arrayMethods => arrayMethods.__proto__ => Array.prototype
-
-let methodsToPatch = [
-  "push",
-  "pop",
-  "shift",
-  "unshift",
-  "splice",
-  "reverse",
-  "sort",
-];
-methodsToPatch.forEach((method) => {
-  arrayMethods[method] = function (...args) {
-    //   这里保留原型方法的执行结果
-    const result = arrayProto[method].apply(this, args);
-    // 这句话是关键
-    // this就是被检测的数据，比如数据是{msg:[1,2,3]}，msg.push(4) this就是msg ob就是msg.__ob__ （上段代码增加，该数据已经被响应式观察）所以下面就可以使用ob.observeArray
-    const ob = this.__ob__;
-
-    // 这里的标志就是代表数组有新增操作
-    let inserted;
-    switch (method) {
-      case "push":
-      case "unshift":
-        inserted = args;
-        break;
-      case "splice":
-        inserted = args.slice(2);
-      default:
-        break;
-    }
-    // 如果有新增的元素 inserted是一个数组 调用Observer实例的observeArray对数组每一项进行观测
-    if (inserted) ob.observeArray(inserted);
-    // 之后咱们还可以在这里检测到数组改变了之后从而触发视图更新的操作--后续源码会揭晓
-    return result;
-  };
-});
-
-```
-
-## 6、this访问data和methods
-
-- 通过 this 直接访问到 data 里面的数据的原因是：data里的属性最终会存储到new Vue的实例（vm）上的 _data对象中，访问 this.xxx，是访问Object.defineProperty代理后的 this._data.xxx。
-```js
-// 初始化data数据
-function initData(vm) {
-  let data = vm.$options.data;
-  //   实例的_data属性就是传入的data
-  // vue组件data推荐使用函数 防止数据在组件之间共享
-  data = vm._data = typeof data === "function" ? data.call(vm) : data || {};
-
-  // 把data数据代理到vm 也就是Vue实例上面 我们可以使用this.a来访问this._data.a
-  for (let key in data) {
-    proxy(vm, `_data`, key);
-  }
-}
-// 数据代理
-function proxy(object, sourceKey, key) {
-  Object.defineProperty(object, key, {
-    get() {
-      return object[sourceKey][key];
-    },
-    set(newValue) {
-      object[sourceKey][key] = newValue;
-    },
-  });
-}
-
-```
-- 通过this直接访问到methods里面的函数的原因是：因为methods里的方法通过 bind 指定了this为 new Vue的实例(vm)
-```js
-// initMethods
-function initMethods (vm, methods) {
-    var props = vm.$options.props;
-    for (var key in methods) {
-      vm[key] = typeof methods[key] !== 'function' ? noop : bind(methods[key], vm);
-    }
-}
-
-
-function nativeBind (fn, ctx) {
-  return fn.bind(ctx)
-}
-var bind = Function.prototype.bind
-  ? nativeBind
-  : polyfillBind
-
-```
-
-
-## 7、diff算法、虚拟dom
-
-### 虚拟dom
-- 虚拟DOM是一个纯粹的JS对象，可以通过document.createDocumentFragment 创建。
-- 浏览器解析一个html大致分为五步：创建DOM tree –> 创建Style Rules -> 构建Render tree -> 布局Layout –> 绘制Painting。每次对真实dom进行操作的时候，浏览器都会从构建dom树开始从头到尾执行一遍流程。真实的dom操作代价昂贵，操作频繁还会引起页面卡顿影响用户体验，虚拟dom就是为了解决这个浏览器性能问题才被创造出来。
-
-### diff算法
-- 1.diff 只进行同级比较
-- 2.根据新老 node子节点不同情况分别处理
-
-### patchVnode的规则
-  ![dd](../patch.jpg)
-
-- 1.如果新旧VNode都是静态的，同时它们的key相同（代表同一节点），那么只需要替换elm以及componentInstance即可（原地复用）。
-- 2.新老节点均有children子节点且不同，则对子节点进行diff操作，调用**updateChildren**，这个updateChildren也是diff的核心。
-- 3.如果只有新节点存在子节点，先清空老节点DOM的文本内容，然后为当前DOM节点加入子节点。
-- 4.如果只有老节点有子节点，直接删除老节点的子节点。
-- 5.当新老节点都无子节点的时候，只是文本的替换
-
-
-```js
-// src/vdom/patch.js
-
-export function patch(oldVnode, vnode) {
-  const isRealElement = oldVnode.nodeType;
-  if (isRealElement) {
-    // oldVnode是真实dom元素 就代表初次渲染
-  } else {
-    // oldVnode是虚拟dom 就是更新过程 使用diff算法
-    if (oldVnode.tag !== vnode.tag) {
-      // 如果新旧标签不一致 用新的替换旧的 oldVnode.el代表的是真实dom节点--同级比较
-      oldVnode.el.parentNode.replaceChild(createElm(vnode), oldVnode.el);
-    }
-    // 如果旧节点是一个文本节点
-    if (!oldVnode.tag) {
-      if (oldVnode.text !== vnode.text) {
-        oldVnode.el.textContent = vnode.text;
-      }
-    }
-    // 不符合上面两种 代表标签一致 并且不是文本节点
-    // 为了节点复用 所以直接把旧的虚拟dom对应的真实dom赋值给新的虚拟dom的el属性
-    const el = (vnode.el = oldVnode.el);
-    updateProperties(vnode, oldVnode.data); // 更新属性
-    const oldCh = oldVnode.children || []; // 老的儿子
-    const newCh = vnode.children || []; // 新的儿子
-    if (oldCh.length > 0 && newCh.length > 0) {
-      // 新老都存在子节点
-      updateChildren(el, oldCh, newCh);
-    } else if (oldCh.length) {
-      // 老的有儿子新的没有
-      el.innerHTML = "";
-    } else if (newCh.length) {
-      // 新的有儿子
-      for (let i = 0; i < newCh.length; i++) {
-        const child = newCh[i];
-        el.appendChild(createElm(child));
-      }
-    }
-  }
-}
-
-```
-
-
-### updateChildren 更新子节点-diff 核心方法
-```js
-
-// 判断两个vnode的标签和key是否相同 如果相同 就可以认为是同一节点就地复用
-function isSameVnode(oldVnode, newVnode) {
-  return oldVnode.tag === newVnode.tag && oldVnode.key === newVnode.key;
-}
-
-// diff算法核心 采用双指针的方式 对比新老vnode的儿子节点
-function updateChildren(parent, oldCh, newCh) {
-  let oldStartIndex = 0; //老儿子的起始下标
-  let oldStartVnode = oldCh[0]; //老儿子的第一个节点
-  let oldEndIndex = oldCh.length - 1; //老儿子的结束下标
-  let oldEndVnode = oldCh[oldEndIndex]; //老儿子的起结束节点
-
-  let newStartIndex = 0; //同上  新儿子的
-  let newStartVnode = newCh[0];
-  let newEndIndex = newCh.length - 1;
-  let newEndVnode = newCh[newEndIndex];
-
-  // 根据key来创建老的儿子的index映射表  类似 {'a':0,'b':1} 代表key为'a'的节点在第一个位置 key为'b'的节点在第二个位置
-  function makeIndexByKey(children) {
-    let map = {};
-    children.forEach((item, index) => {
-      map[item.key] = index;
-    });
-    return map;
-  }
-  // 生成的映射表
-  let map = makeIndexByKey(oldCh);
-
-  // 只有当新老儿子的双指标的起始位置不大于结束位置的时候  才能循环 一方停止了就需要结束循环
-  while (oldStartIndex <= oldEndIndex && newStartIndex <= newEndIndex) {
-    // 因为暴力对比过程把移动的vnode置为 undefined 如果不存在vnode节点 直接跳过
-    if (!oldStartVnode) {
-      oldStartVnode = oldCh[++oldStartIndex];
-    } else if (!oldEndVnode) {
-      oldEndVnode = oldCh[--oldEndIndex];
-    } else if (isSameVnode(oldStartVnode, newStartVnode)) {
-      // 头和头对比 依次向后追加
-      patch(oldStartVnode, newStartVnode); //递归比较儿子以及他们的子节点
-      oldStartVnode = oldCh[++oldStartIndex];
-      newStartVnode = newCh[++newStartIndex];
-    } else if (isSameVnode(oldEndVnode, newEndVnode)) {
-      //尾和尾对比 依次向前追加
-      patch(oldEndVnode, newEndVnode);
-      oldEndVnode = oldCh[--oldEndIndex];
-      newEndVnode = newCh[--newEndIndex];
-    } else if (isSameVnode(oldStartVnode, newEndVnode)) {
-      // 老的头和新的尾相同 把老的头部移动到尾部
-      patch(oldStartVnode, newEndVnode);
-      parent.insertBefore(oldStartVnode.el, oldEndVnode.el.nextSibling); //insertBefore可以移动或者插入真实dom
-      oldStartVnode = oldCh[++oldStartIndex];
-      newEndVnode = newCh[--newEndIndex];
-    } else if (isSameVnode(oldEndVnode, newStartVnode)) {
-      // 老的尾和新的头相同 把老的尾部移动到头部
-      patch(oldEndVnode, newStartVnode);
-      parent.insertBefore(oldEndVnode.el, oldStartVnode.el);
-      oldEndVnode = oldCh[--oldEndIndex];
-      newStartVnode = newCh[++newStartIndex];
-    } else {
-      // 上述四种情况都不满足 那么需要暴力对比
-      // 根据老的子节点的key和index的映射表 从新的开始子节点进行查找 如果可以找到就进行移动操作 如果找不到则直接进行插入
-      let moveIndex = map[newStartVnode.key];
-      if (!moveIndex) {
-        // 老的节点找不到  直接插入
-        parent.insertBefore(createElm(newStartVnode), oldStartVnode.el);
-      } else {
-        let moveVnode = oldCh[moveIndex]; //找得到就拿到老的节点
-        oldCh[moveIndex] = undefined; //这个是占位操作 避免数组塌陷  防止老节点移动走了之后破坏了初始的映射表位置
-        parent.insertBefore(moveVnode.el, oldStartVnode.el); //把找到的节点移动到最前面
-        patch(moveVnode, newStartVnode);
-      }
-    }
-  }
-  // 如果老节点循环完毕了 但是新节点还有  证明  新节点需要被添加到头部或者尾部
-  if (newStartIndex <= newEndIndex) {
-    for (let i = newStartIndex; i <= newEndIndex; i++) {
-      // 这是一个优化写法 insertBefore的第一个参数是null等同于appendChild作用
-      const ele =
-        newCh[newEndIndex + 1] == null ? null : newCh[newEndIndex + 1].el;
-      parent.insertBefore(createElm(newCh[i]), ele);
-    }
-  }
-  // 如果新节点循环完毕 老节点还有  证明老的节点需要直接被删除
-  if (oldStartIndex <= oldEndIndex) {
-    for (let i = oldStartIndex; i <= oldEndIndex; i++) {
-      let child = oldCh[i];
-      if (child != undefined) {
-        parent.removeChild(child.el);
-      }
-    }
-  }
-}
-
-```
- - 1.使用双指针移动来进行新老节点的对比
-![dd](../patch1.jpg)
-- 2.用 isSameVnode 来判断新老子节点的头头 尾尾 头尾 尾头 是否是同一节点 如果满足就进行相应的移动指针(头头 尾尾)或者移动 dom 节点(头尾 尾头)操作
-- 3.如果全都不相等 进行暴力对比 如果找到了利用 key 和 index 的映射表来移动老的子节点到前面去 如果找不到就直接插入
-- 4.对老的子节点进行递归 patch 处理
-- 5.后老的子节点有多的就删掉 新的子节点有多的就添加到相应的位置
-
-## 8、nextTick 实现原理
-同步往队列里添加回调函数
-promise => MutationObserver => setImmediate => setTimeout
-
-```js
-// src/observer/scheduler.js
-//先同步把 watcher 都放到队列里面去 执行完队列的事件之后再清空队列
-
-import { nextTick } from "../util/next-tick";
-let queue = [];
-let has = {};
-function flushSchedulerQueue() {
-  for (let index = 0; index < queue.length; index++) {
-    //   调用watcher的run方法 执行真正的更新操作
-    queue[index].run();
-  }
-  // 执行完之后清空队列
-  queue = [];
-  has = {};
-}
-
-// 实现异步队列机制
-export function queueWatcher(watcher) {
-  const id = watcher.id;
-  //   watcher去重
-  if (has[id] === undefined) {
-    //  同步代码执行 把全部的watcher都放到队列里面去
-    queue.push(watcher);
-    has[id] = true;
-    // 进行异步调用
-    nextTick(flushSchedulerQueue);
-  }
-}
-}
-```
-```js
-// src/util/next-tick.js
-
-let callbacks = [];
-let pending = false;
-function flushCallbacks() {
-  pending = false; //把标志还原为false
-  // 依次执行回调
-  for (let i = 0; i < callbacks.length; i++) {
-    callbacks[i]();
-  }
-}
-let timerFunc; //定义异步方法  采用优雅降级
-if (typeof Promise !== "undefined") {
-  // 如果支持promise
-  const p = Promise.resolve();
-  timerFunc = () => {
-    p.then(flushCallbacks);
-  };
-} else if (typeof MutationObserver !== "undefined") {
-  // MutationObserver 主要是监听dom变化 也是一个异步方法
-  let counter = 1;
-  const observer = new MutationObserver(flushCallbacks);
-  const textNode = document.createTextNode(String(counter));
-  observer.observe(textNode, {
-    characterData: true,
-  });
-  timerFunc = () => {
-    counter = (counter + 1) % 2;
-    textNode.data = String(counter);
-  };
-} else if (typeof setImmediate !== "undefined") {
-  // 如果前面都不支持 判断setImmediate
-  timerFunc = () => {
-    setImmediate(flushCallbacks);
-  };
-} else {
-  // 最后降级采用setTimeout
-  timerFunc = () => {
-    setTimeout(flushCallbacks, 0);
-  };
-}
-
-export function nextTick(cb) {
-  // 除了渲染watcher  还有用户自己手动调用的nextTick 一起被收集到数组
-  callbacks.push(cb);
-  if (!pending) {
-    // 如果多次调用nextTick  只会执行一次异步 等异步队列清空之后再把标志变为false
-    pending = true;
-    timerFunc();
-  }
-}
-```
-
-## 9、computed
-
-#### 对计算属性进行属性劫持
-
-- defineComputed 重新定义计算属性,劫持get方法,计算属性依赖的值,需要根据依赖值是否发生变化来判断计算属性是否需要重新计算;
-- createComputedGetter 判断计算属性依赖的值是否变化,Watcher增加dirty标志,如果标志变为 true 代表需要调用 watcher.evaluate重新计算;
-```js
-//  src/state.js
-
-// 定义普通对象用来劫持计算属性
-const sharedPropertyDefinition = {
-  enumerable: true,
-  configurable: true,
-  get: () => {},
-  set: () => {},
-};
-
-// 重新定义计算属性  对get和set劫持
-function defineComputed(target, key, userDef) {
-  if (typeof userDef === "function") {
-    // 如果是一个函数  需要手动赋值到get上
-    sharedPropertyDefinition.get = createComputedGetter(key);
-  } else {
-    sharedPropertyDefinition.get = createComputedGetter(key);
-    sharedPropertyDefinition.set = userDef.set;
-  }
-  //   利用Object.defineProperty来对计算属性的get和set进行劫持
-  Object.defineProperty(target, key, sharedPropertyDefinition);
-}
-
-// 重写计算属性的get方法 来判断是否需要进行重新计算
-function createComputedGetter(key) {
-  return function () {
-    const watcher = this._computedWatchers[key]; //获取对应的计算属性watcher
-    if (watcher) {
-      if (watcher.dirty) {
-        watcher.evaluate(); //计算属性取值的时候 如果是脏的  需要重新求值
-      }
-      return watcher.value;
-    }
-  };
-}
-
-```
-
-```js
-// src/observer/watcher.js
-
-export default class Watcher {
-  constructor(vm, exprOrFn, cb, options) {
-    this.lazy = options.lazy; //标识计算属性watcher
-    this.dirty = this.lazy; //dirty可变  表示计算watcher是否需要重新计算 默认值是true
-    // 非计算属性实例化就会默认调用get方法 进行取值  保留结果 计算属性实例化的时候不会去调用get
-    this.value = this.lazy ? undefined : this.get();
-  }
-  get() {
-    pushTarget(this); // 在调用方法之前先把当前watcher实例推到全局Dep.target上
-    const res = this.getter.call(this.vm); //计算属性在这里执行用户定义的get函数 访问计算属性的依赖项 从而把自身计算Watcher添加到依赖项dep里面收集起来
-    popTarget(); // 在调用方法之后把当前watcher实例从全局Dep.target移除
-    return res;
-  }
-  update() {
-    // 计算属性依赖的值发生变化 只需要把dirty置为true  下次访问到了重新计算
-    if (this.lazy) {
-      this.dirty = true;
-    } else {
-      // 每次watcher进行更新的时候  可以让他们先缓存起来  之后再一起调用
-      // 异步队列机制
-      queueWatcher(this);
-    }
-  }
-  //   计算属性重新进行计算 并且计算完成把dirty置为false
-  evaluate() {
-    this.value = this.get();
-    this.dirty = false;
-  }
-  depend() {
-    // 计算属性的watcher存储了依赖项的dep
-    let i = this.deps.length;
-    while (i--) {
-      this.deps[i].depend(); //调用依赖项的dep去收集渲染watcher
-    }
-  }
-}
-```
-- 1.实例化的时候如果是计算属性 不会去调用 get 方法访问值进行依赖收集
-- 2.update 方法只是把计算 watcher 的 dirty 标识为 true 只有当下次访问到了计算属性的时候才会重新计算
-- 3.新增 evaluate 方法专门用于计算属性重新计算
-- 4.新增 depend 方法 让计算属性的依赖值收集外层 watcher
-
-## 10、watch
-
-#### 侦听属性的初始化
-```js
-// src/state.js
-// 统一初始化数据的方法
-export function initState(vm) {
-  // 获取传入的数据对象
-  const opts = vm.$options;
-  if (opts.watch) {
-    //侦听属性初始化
-    initWatch(vm);
-  }
-}
-
-// 初始化watch
-function initWatch(vm) {
-  let watch = vm.$options.watch;
-  for (let k in watch) {
-    const handler = watch[k]; //用户自定义watch的写法可能是数组 对象 函数 字符串
-    if (Array.isArray(handler)) {
-      // 如果是数组就遍历进行创建
-      handler.forEach((handle) => {
-        createWatcher(vm, k, handle);
-      });
-    } else {
-      createWatcher(vm, k, handler);
-    }
-  }
-}
-// 创建watcher的核心
-function createWatcher(vm, exprOrFn, handler, options = {}) {
-  if (typeof handler === "object") {
-    options = handler; //保存用户传入的对象
-    handler = handler.handler; //这个代表真正用户传入的函数
-  }
-  if (typeof handler === "string") {
-    //   代表传入的是定义好的methods方法
-    handler = vm[handler];
-  }
-  //   调用vm.$watch创建用户watcher
-  return vm.$watch(exprOrFn, handler, options);
-}
-
-```
-#### $watch
-```js
-//  src/state.js
-import Watcher from "./observer/watcher";
-Vue.prototype.$watch = function (exprOrFn, cb, options) {
-  const vm = this;
-  //  user: true 这里表示是一个用户watcher
-  let watcher = new Watcher(vm, exprOrFn, cb, { ...options, user: true });
-  // 如果有immediate属性 代表需要立即执行回调
-  if (options.immediate) {
-    cb(); //如果立刻执行
-  }
-};
-
-//原型方法$watch 就是创建自定义 watch 的核心方法 把用户定义的 options 和 user:true 传给构造函数 Watcher
-```
-
-### 1
-```js
-// src/observer/watcher.js
-
-import { isObject } from "../util/index";
-export default class Watcher {
-  constructor(vm, exprOrFn, cb, options) {
-
-    this.user = options.user; //标识用户watcher
-
-    // 如果表达式是一个函数
-    if (typeof exprOrFn === "function") {
-      this.getter = exprOrFn;
-    } else {
-      this.getter = function () {
-        //用户watcher传过来的可能是一个字符串   类似a.a.a.a.b
-        let path = exprOrFn.split(".");
-        let obj = vm;
-        for (let i = 0; i < path.length; i++) {
-          obj = obj[path[i]]; //vm.a.a.a.a.b
-        }
-        return obj;
-      };
-    }
-    // 实例化就进行一次取值操作 进行依赖收集过程
-    this.value = this.get();
-  }
-  run() {
-    const newVal = this.get(); //新值
-    const oldVal = this.value; //老值
-    this.value = newVal; //现在的新值将成为下一次变化的老值
-    if (this.user) {
-      // 如果两次的值不相同  或者值是引用类型 因为引用类型新老值是相等的 他们是指向同一引用地址
-      if (newVal !== oldVal || isObject(newVal)) {
-        this.cb.call(this.vm, newVal, oldVal);
-      }
-    } else {
-      // 渲染watcher
-      this.cb.call(this.vm);
-    }
-  }
-}
-```
-- 1.实例化的时候为了兼容用户 watch 的写法 会将传入的字符串写法转成 Vue 实例对应的值 并且调用 get 方法获取并保存一次旧值
-- 2.run 方法判断如果是用户 watch 那么执行用户传入的回调函数 cb 并且把新值和旧值作为参数传入进去
 
+::: tip
+ Observer 数据监听器，能够对数据对象的所有属性进行监听，如有变动可拿到最新值并通知订阅者，内部采用Object.defineProperty的getter和setter来实现。
 
+ Compile 指令解析器，它的作用对每个元素节点的指令进行扫描和解析，根据指令模板替换数据，以及绑定相应的更新函数。
+
+ Watcher 订阅者， 作为连接 Observer 和 Compile 的桥梁，能够订阅并收到每个属性变动的通知，执行指令绑定的相应回调函数。
+
+ Dep 消息订阅器，内部维护了一个数组，用来收集订阅者（Watcher），数据变动触发notify 函数，再调用订阅者的 update 方法。
+:::
+
+从图中可以看出，当执行 new Vue() 时，Vue 就进入了初始化阶段，一方面Vue 会遍历 data 选项中的属性，并用 Object.defineProperty 将它们转为 getter/setter，实现数据变化监听功能；另一方面，Vue 的指令编译器Compile 对元素节点的指令进行扫描和解析，初始化视图，并订阅Watcher 来更新视图， 此时Wather 会将自己添加到消息订阅器中(Dep),初始化完毕。
+
+当数据发生变化时，Observer 中的 setter 方法被触发，setter 会立即调用Dep.notify()，Dep 开始遍历所有的订阅者，并调用订阅者的 update 方法，订阅者收到通知后对视图进行相应的更新。
+
+Vue3.0 要使用 Proxy 替换原本的 API 原因在于 Proxy 无需一层层递归为每个属性添加代理，一次即可完成以上操作，性能上更好，并且原本的实现有一些数据更新不能监听到，但是 Proxy 可以完美监听到任何方式的数据改变
+
+
+## 5.keep-alive
+keep-alive是Vue提供的一个抽象组件，主要用于保留组件状态或避免重新渲染
+<component :is='curremtView' keep-alive></component>
+
+## 6.nextTick用法
+在下次 DOM 更新循环结束之后执行延迟回调
+
+## 7.对 Vue 生命周期的理解？
+开始创建、初始化数据、编译模板、挂载Dom→渲染、更新→渲染、卸载等一系列过程
+总共分为 8 个阶段创建前/后，载入前/后，更新前/后，销毁前/后
+
+创建前/后： 在 beforeCreate 阶段，vue 实例的挂载元素 el 还没有
+
+载入前/后：在 beforeMount 阶段，vue 实例的$el 和 data 都初始化了，但还是挂载之前为虚拟的 dom 节点，data.message 还未替换。在 mounted 阶段，vue 实例挂载完成，data.message 成功渲染
+
+更新前/后：当 data 变化时，会触发 beforeUpdate 和 updated 方法
+
+销毁前/后：在执行 destroy 方法后，对 data 的改变不会再触发周期函数，说明此时 vue 实例已经解除了事件监听以及和 dom 的绑定，但是 dom 结构依然存在
+
+## 8.每个周期具体适合哪些场景
+beforecreate : 可以在这加个loading事件，在加载实例时触发
+created : 初始化完成时的事件写在这里，如在这结束loading事件，异步请求也适宜在这里调用
+mounted : 挂载元素，获取到DOM节点 updated : 如果对数据统一处理，在这里写上相应函数
+beforeDestroy : 可以做一个确认停止事件的确认框 
+
+
+## 9.组件之间如何传值？
+- 1.props / $emit
+- 2.vuex
+- 3.provide/ inject
+- 4.ref / refs
+- 5.$children / $parent
+- 6.eventBus等
+
+## 10.vue路由传参数
+- 1.使用query方法传入的参数使用this.$route.query接受
+- 2.使用params方式传入的参数使用this.$route.params接受
+
+## 11.vuex 是什么？ 有哪几种属性？
+Vuex 是一个专为 Vue.js 应用程序开发的状态管理模式。
+
+有 5 种，分别是 state、getter、mutation、action、module
+
+- vuex 的 store 是什么？
+vuex 就是一个仓库，仓库里放了很多对象。其中 state 就是数据源存放地，对应于一般 vue 对象里面的 datastate 里面存放的数据是响应式的，vue 组件从 store 读取数据，若是 store 中的数据发生改变，依赖这相数据的组件也会发生更新它通过 mapState 把全局的 state 和 getters 映射到当前组件的 computed 计算属性
+- vuex 的 getter 是什么？
+getter 可以对 state 进行计算操作，它就是 store 的计算属性虽然在组件内也可以做计算属性，但是 getters 可以在多给件之间复用如果一个状态只在一个组件内使用，是可以不用 getters
+- vuex 的 mutation 是什么？
+更改Vuex的store中的状态的唯一方法是提交mutation
+- vuex 的 action 是什么？
+action 类似于 muation, 不同在于：action 提交的是 mutation,而不是直接变更状态action 可以包含任意异步操作 
+vue 中 ajax 请求代码应该写在组件的 methods 中还是 vuex 的 action 中
+vuex 的 module 是什么？
+面对复杂的应用程序，当管理的状态比较多时；我们需要将vuex的store对象分割成模块(modules)。
+
+
+## 12.vue-router 有哪几种导航钩子?
+
+全局导航钩子:
+
+router.beforeEach(to, from, next),
+
+router.beforeResolve(to, from, next),
+
+router.afterEach(to, from ,next)
+
+组件内钩子:
+
+beforeRouteEnter,
+
+beforeRouteUpdate,
+
+beforeRouteLeave
+
+单独路由独享组件:
+
+beforeEnter
+
+## 13.v-model的原理？
+v-model本质上就是语法糖，即利用v-model绑定数据后，其实就是既绑定了数据，又添加了一个input事件监听
+
+## 14.vue中key的原理？
+作用的话，便于diff算法的更新，key的唯一性，能让算法更快的找到需要更新的dom，需要注意的是，key要唯一，不然会出现很隐蔽性的更新问题。
+
+## 15.使用vue渲染大量数据时应该怎么优化
+Object.freeze
+使用方式：this.item = Object.freeze(Object.assign({}, this.item))
+
+## 16.provide和inject的理解
+通过在父组件中inject一些数据然后再所有子组件中都可以通过provide获取使用该参数,
+
+主要是为了解决一些循环组件比如tree, menu, list等, 传参困难, 并且难以管理的问题, 主要用于组件封装, 常见于一些ui组件库
+
+
+## 17.vuex 的mutation和action的特性是什么？有什么区别？
+mutation用于修改state的数据，是同步的
+
+action 类似于 muation, 不同在于：action 提交的是 mutation,而不是直接变更状态
+
+action 可以包含任意异步操作
+
+## 18.为什么vue中 data 必须是一个函数？
+一个组件的 data 选项必须是一个函数，因此每个实例可以维护一份被返回对象的独立的拷贝：
+返回一个唯一的对象，不要和其他组件共用一个对象进行返回!!!每一个实例的data属性都是独立的；
+
+## 19.axios封装
+1.设置axios默认baseURL axios.defaults.baseURL
+2.设置axios默认请求数据类型  axios.defaults.headers.common["Accept"] = "application/json"
+#### 请求拦截
+每次发送请求之前判断vuex中是否存在token,统一在http请求的header都加上token，这样后台根据token判断你的登录情况
+#### 响应拦截
+服务器返回给我们的数据，我们在拿到之前可以对他进行一些处理。例如上面的思想：如果后台返回的状态码是200，则正常返回数据，否则的根据错误的状态码类型进行一些我们需要的错误。
+#### 登陆token
+如果token存在说明用户已经登陆过，则更新vuex中的token状态。然后，在每次请求接口的时候，都会在请求的header中携带token.
+#### 路由拦截
+1.处理低版本浏览器
+2.仓库中没有token,并且要去的页面不是登陆页，跳转到登陆页
+3.权限页面控制和404
+利用全局路由钩子beforeEach 
+#### 权限控制
+1 给账号增加角色 不同角色对应不同的权限
+2 根据用户信息的权限返回一个权限对象
+3 公共方法permission.js处理这个权限对象
+4 在路由中meta设置auth. 公共侧边栏利用this.permission(meta.auth)控制页面权限
+
+## 20.Virtual Dom 的优势在哪里？
+> DOM 引擎、JS 引擎 相互独立，但又工作在同一线程（主线程）JS 代码调用 DOM API 必须 挂起 JS 引擎、转换传入参数数据、激活 DOM 引擎,引擎间切换的单位代价将迅速积累若其中有强制重绘的 DOM API 调用，重新计算布局、重新绘制图像会引起更大的性能消耗.
+- 1.虚拟 DOM 不会立马进行排版与重绘操作
+- 2.虚拟 DOM 进行频繁修改，然后一次性比较并修改真实 DOM 中需要改的部分，最后在真实 DOM 中进行排版与重绘，减少过多DOM节点排版与重绘损耗
+- 3.虚拟 DOM 有效降低大面积真实 DOM 的重绘与排版，因为最终与真实 DOM 比较差异，可以只渲染局部
+
+## 21.单页应用有那些优缺点？
+优点：对服务器请求较少，减轻了服务器的压力，只需要一次加载，页面片段之间切换快，用户体验良好
+缺点：第一次加载时耗费时间较长，不利于SEO
+
+## 22.common.js 和 es6 中模块引入的区别？
+- 1.CommonJS 模块输出的是一个值的拷贝，ES6 模块输出的是值的引用。
+- 2.CommonJS 模块是运行时加载，ES6 模块是编译时输出接口。
+- 3.CommonJs 是单个值导出，ES6 Module可以导出多个
+
+## 23.vue3今年发布了，请你说一下他们之间在相应式的实现上有什么区别？Proxy 相比于 defineProperty 的优势 
+vue2采用的是defineProperty去定义get，set，而vue3改用了proxy.
+
+#### 24.Proxy的优势
+- 1.可以直接监听对象而非属性
+- 2.可以直接监听数组的变化
+- 3.Proxy返回一个新对象，可以只操作新对象达到目的，而Object.defineProperty只能遍历对象属性直接修改
+
+## 25.像vue-router，vuex他们都是作为vue插件，请说一下他们分别都是如何在vue中生效的？
+通过vue的插件系统，用vue.mixin混入到全局，在每个组件的生命周期的某个阶段注入组件实例
+
+## 26.请你说一下vue的设计架构
+vue2采用的是典型的混入式架构，各部分分模块开发，再通过一个mixin去混入到最终暴露到全局的类上
+
+## 27.对3.0的新特性有没有了解？
+- 更快
+  - 虚拟DOM重写
+  - 优化slots的生成
+  - 静态属性提升
+  - 基于proxy的响应式系统
+- 更小：优化核心库体积
+- 更易维护：Ts+模块化
+- 更加优化
+- 更容易使用

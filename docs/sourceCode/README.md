@@ -1,5 +1,33 @@
 # 一、Vue2
 
+
+## 1、v-if和v-for哪个优先级更高？同时出现 如何优化？
+> 源码位置 compiler/condegen/index.js
+
+- 1.显然v-for的优先级高于v-if (codegenindex源码中顺序为el.once > el.for > el.if)
+- 2.如果同时出现，每次渲染都会先执行循环在判断，循环不可避免，浪费性能
+- 3.将v-if提到外面一层，内部进行v-for循环
+
+## 2、Vue中的key的作用和工作原理？
+> 源码位置 src/core/vdom/patch.js - updateChildren()
+
+- 1.key的主要作用是为了更高效的更新虚拟Dom,其原理是vue在patch过程中通过key可以精准的判断两个节点
+是否是同一个，避免频繁更新不同的元素，会让整个patch过程更加高效，减少dom操作，提高性能。
+- 2.若不设置key还可能在列表更新引发一些隐藏的bug
+
+## 3、怎么理解vue中的diff算法？
+> 源码分析1：必要性 lifecycle.js - mountConponent()
+组件中可能存在很多个data中的key使用
+> 源码分析2：执行方法 patch.js- patchVnode()
+patchVnode是diff发生的地方 整体策略:深度优先，同级比较
+> 源码分析3：高效性 patch.js -updateChildren()
+ 
+- 1.diff算法是虚拟DOM的必然产物：通过新旧虚拟DOM作对比，将变化的地方更新在真实的DOM上，
+另外，也需要diff高效的执行对比过程。
+- 2.vue 2.x中为了降低Watcher粒度，每个组件只有一个watcher与之对应，只有引入diff才能精确找到
+变化的地方。
+- 3.vue中diff执行的时刻是组件实例执行其更新函数时，它会对比上一次渲染结果的oldVnode和新的渲染结果
+newVnode,此过程称为patch。
 ## 1、响应式数据原理
 
 ### 1.初始化过程

@@ -1,6 +1,38 @@
 # 九、vue项目的性能优化
 
 
+- 1.路由懒加载
+```js
+component : ()=>import("./xx.vue")
+
+```
+- 2.keep-alive 缓存页面
+```js
+ <keep-alive include="getProcess">
+        <router-view></router-view>
+</keep-alive>
+```
+- 3.使用v-show复用dom
+- 4.v-for 遍历避免同时使用v-if
+- 5.长列表性能优化
+  - 如果列表是纯粹的数据展示，Object,freeze()冻结
+  - 如果是大数据长列表 可采用虚拟滚动。 vue-virtual-scroller
+- 6.图片懒加载
+- 7.第三方插件按需引入  
+- 8.无状态的组件标记为函数式组件
+```js
+<template functional>
+    <div class="tab">
+         <div v-if="props.value"></div>
+    </div>
+</template>    
+<script>
+export default {
+    props:['value']
+}
+</script>
+```
+
 ## 一、代码层面的优化
 **1.1、v-if 和 v-show 区分使用场景**
 
