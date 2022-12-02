@@ -21,28 +21,20 @@ module.exports = {
 				lastUpdated: '上次更新',
 				nav: [
                     {
-                        text: '吐血整理八股',
-                        link: "/allStart/"
+                        text: '八股合集',
+                        link: "/bagu/"
+                    },
+                    {
+                        text: '源码系列',
+                        link: "/sourceCode/"
                     },
 					{
-                        text: '基础',
+                        text: '前端基础',
                         link: "/base/"
-                    },
-                    {
-                        text: '进阶',
-                        link: "/improve/"
-                    },
-                    {
-                        text:'手写',
-                        link:'/write/',
                     },
                     {
                         text:'Vue',
                         link:'/vue/'
-                    },
-                    {
-                        text:'Vue基础',
-                        link:'/vueBase/'
                     },
                     {
                         text:'React',
@@ -61,10 +53,6 @@ module.exports = {
                         link: '/test/'
                     },
                     {
-                        text: 'TypeScript',
-                        link: '/typeScript/'
-                    },
-                    {
                         text:'算法',
                         link:'/arithmetic/'
                     },
@@ -74,7 +62,7 @@ module.exports = {
                     // },
 				],
 				sidebar: {
-                    '/allStart/':[
+                    '/bagu/':[
                         '',
                         'CSS',
                         'JavaScript',
@@ -86,8 +74,12 @@ module.exports = {
                         '代码输出',
                         'Vue',
                         'Vue优化',
-                        'LeetCode'
-
+                        'LeetCode',
+                        'TypeScript'
+                    ],
+                    '/sourceCode/':[
+                        '',
+                        'Vue3',
                     ],
 					'/base/': [
                         // '',
@@ -97,29 +89,21 @@ module.exports = {
                         'JS',
                         'ES6',
                         '数组',
-                        // 'exam'
-                    ],
-                    '/improve/': [
                         '缓存',
                         'JS执行机制',
                         'Promise',
                         'webpack'
-                    ],
-                    // '/webpack/':[
-                    //     ''
-                    // ],
-                    '/write/':[ 
-                        ''
+                        // 'exam'
                     ],
                     '/vue/': [
                         '',
-                        'Vuex',
+                        'Vue2',
                         'Vue3',
+                        'Vuex',
                         'Vite'
                     ],
                     '/vueBase/': [
                         '',
-                        'Vue源码分析'
                     ],
                     '/react/': [
                         '',

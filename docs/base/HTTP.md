@@ -1,6 +1,6 @@
 # HTTP
 
-![dd](../http.png)
+![dd](../images/http.png)
 
 - TCP协议（传输控制协议）:应用程序之间的通信
 - IP协议（网际协议）:计算机之间的通信

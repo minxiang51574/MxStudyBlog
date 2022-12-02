@@ -1,5 +1,6 @@
-# 真题
-## typescript 的特点
+# 十一、TypeScript
+
+## 1、typescript 的特点
 
 - 可以在编译期间发现并纠正错误
 - 提高可维护性

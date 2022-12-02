@@ -1,5 +1,5 @@
 # node
-![dd](../node.png)
+![dd](../images/node.png)
 ## 特点
 - 事件驱动 非阻塞I/O
 - 优点:
@@ -23,7 +23,7 @@ koa2完全使用Promise并配合async来实现异步
 > 自己的小网站用koa实现接口编码[vue-admin-node](https://github.com/minxiang51574/vue-admin-node)
 附上接口示例编写流程。
 
- ![koa项目目录](../koa.png)
+ ![koa项目目录](../images/koa.png)
 
 
  ```js

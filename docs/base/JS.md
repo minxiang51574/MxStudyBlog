@@ -1,7 +1,7 @@
 # JS
 
 [深入理解 javascript 原型和闭包系列](https://dojay.cn/fe/yuanxing.html) 。
-![dd](../js.png)
+![dd](../images/js.png)
 ## 1、数据类型及区别
 
 基本类型： number string boolean null undefined symbol bigint
@@ -72,8 +72,8 @@ Object.prototype.toString.call() 常用于判断浏览器内置对象时。
 
 ## 2、原型 && 原型链
 
-![原型](../proto.png)
-![原型](../proto2.jpg)
+![原型](../images/proto.png)
+![原型](../images/proto2.jpg)
 
 #### 原型链：每个对象都有**proto**属性，我们称之为原型，原型也可能是一个对象，如果它是一个对象，也有**proto**属性，这样就形成了一条线型的链，我们称之为原型链。
 - 所有对象都有一个属性 __proto__ 指向一个对象，也就是原型

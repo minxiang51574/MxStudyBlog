@@ -98,7 +98,7 @@ const dafaultState = fromJS({
  ```
  ### redux工作流程
 
- ![dd](../redux.jpg)
+ ![dd](../images/redux.jpg)
 
  ### （React）setState为什么异步？能不能同步？什么时候异步？什么时候同步？
 - setState 只在合成事件和钩子函数中是“异步”的，在原生事件和 setTimeout 中都是同步的。

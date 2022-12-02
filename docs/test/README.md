@@ -177,7 +177,7 @@ B.wx.connectSocket （WebSocket 连接）的最大并发限制是 5
 - load 仅用于检测一个完全加载的页面，页面的html、css、js、图片等资源都已经加载完之后才会触发 load 事件
 
 ## 头条 —— 实现一个带并发限制的promise异步调度器
-![原型](../diaoduqi.png)
+![原型](../images/diaoduqi.png)
 ```js
 class Scheduler {
   constructor() {

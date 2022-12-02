@@ -21,7 +21,7 @@
  ```
 
 ## 3、redux工作流程
-  ![dd](../redux.jpg)
+  ![dd](../images/redux.jpg)
 
 ## 4、Redux-thunk、Redux-saga
 使用了redux-thunk后，store中reducer就不仅仅接受一个action对象了，它可以接受一个函数了
