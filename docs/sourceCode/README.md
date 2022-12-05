@@ -1534,7 +1534,7 @@ function updateChildren(parent, oldCh, newCh) {
 ![dd](../images/patch1.jpg)
 - 2.用 isSameVnode 来判断新老子节点的头头 尾尾 头尾 尾头 是否是同一节点 如果满足就进行相应的移动指针(头头 尾尾)或者移动 dom 节点(头尾 尾头)操作
 - 3.如果全都不相等 进行暴力对比 如果找到了利用 key 和 index 的映射表来移动老的子节点到前面去 如果找不到就直接插入
-![dd](../images/patch3.jpg)
+![dd](../images/patch3.png)
 - 4.对老的子节点进行递归 patch 处理
 - 5.最后老的子节点有多的就删掉 新的子节点有多的就添加到相应的位置
 
@@ -1557,7 +1557,7 @@ export function lifecycleMixin(Vue) {
   };
 }
 ```
-![dd](../images/patch4.jpg)
+![dd](../images/patch4.png)
 
 ## 10、Mixin混入原理
 ### 1.定义全局 Mixin 函数
