@@ -50,7 +50,6 @@ DOCTYPE 是 HTML5 中一种标准通用标记语言的文档类型声明，它�
 
 下图可以直观的看出三者之间的区别:
 
-![image.png](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603547262709-5029c4e4-42f5-4fd4-bcbb-c0e0e3a40f5a.png)
 
 其中蓝色代表 js 脚本网络加载时间，红色代表 js 脚本执行时间，绿色代表 html 解析。
 

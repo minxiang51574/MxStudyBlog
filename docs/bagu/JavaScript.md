@@ -2268,7 +2268,7 @@ console.log(func.constructor === Fn)// true
 
 
 
-**两者主要区别在于：**前者源程序编译后即可在该平台运行，后者是在运行期间才编译。所以前者运行速度快，后者跨平台性好。
+**两者主要区别在于**：前者源程序编译后即可在该平台运行，后者是在运行期间才编译。所以前者运行速度快，后者跨平台性好。
 
 ### 25. for...in和for...of的区别 
 
@@ -2959,8 +2959,6 @@ console.log('script end')
 
 async 函数返回一个 Promise 对象，当函数执行的时候，一旦遇到 await 就会先返回，等到触发的异步操作完成，再执行函数体内后面的语句。可以理解为，是让出了线程，跳出了 async 函数体。
 
-
-
 例如：
 
 ```js
@@ -2969,8 +2967,6 @@ async function func1() {
 }
 console.log(func1())
 ```
-
-![img](https://cdn.nlark.com/yuque/0/2020/png/1500604/1604021075237-8249a8df-3a28-4bca-9f22-02923aba8618.png?x-oss-process=image%2Fresize%2Cw_1038)
 
 func1的运行结果其实就是一个Promise对象。因此也可以使用then来处理后续逻辑。
 
@@ -3376,7 +3372,6 @@ let result = testAsy();
 console.log(result)
 ```
 
-![img](https://cdn.nlark.com/yuque/0/2020/png/1500604/1605099411873-d2eac25a-5d8c-4586-bc36-769bce79010e.png)
 
 所以，async 函数返回的是一个 Promise 对象。async 函数（包含函数语句、函数表达式、Lambda表达式）会返回一个 Promise 对象，如果在函数中 `return` 一个直接量，async 会把这个直接量通过 `Promise.resolve()` 封装成 Promise 对象。
 

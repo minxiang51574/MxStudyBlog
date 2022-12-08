@@ -192,7 +192,7 @@ a:hover {color: #FF00FF}
 p:first-child {color: red}
 ```
 
-**总结：**伪类是通过在元素选择器上加⼊伪类改变元素状态，⽽伪元素通过对元素的操作进⾏对元素的改变。
+**总结**：伪类是通过在元素选择器上加⼊伪类改变元素状态，⽽伪元素通过对元素的操作进⾏对元素的改变。
 
 ### 10. 对 requestAnimationframe 的理解
 
@@ -340,7 +340,6 @@ CSSSprites（精灵图），将一个页面涉及到的所有图片都包含到�
 
 对于图片来说，为了保证其不失真，1 个图片像素至少要对应一个物理像素，假如原始图片是 500 * 300 像素，那么在 3 倍屏上就要放一个 1500 * 900 像素的图片才能保证 1 个物理像素至少对应一个图片像素，才能不失真。
 
-![img](https://cdn.nlark.com/yuque/0/2020/jpeg/1500604/1605252903834-27a1d90a-7e04-49bc-822a-dadcf974c141.jpeg?x-oss-process=image%2Fresize%2Cw_746#align=left&display=inline&height=1478&margin=%5Bobject%20Object%5D&originHeight=1478&originWidth=1600&size=0&status=done&style=stroke&width=1600)
 
 当然，也可以针对所有屏幕，都只提供最高清图片。虽然低密度屏幕用不到那么多图片像素，而且会因为下载多余的像素造成带宽浪费和下载延迟，但从结果上说能保证图片在所有屏幕上都不会失真。
 
@@ -541,7 +540,6 @@ CSS 工程化是为了解决以下问题：
 
 预处理器，其实就是 CSS 世界的“轮子”。预处理器支持我们写一种类似 CSS、但实际并不是 CSS 的语言，然后把它编译成 CSS 代码：
 
-![image](https://cdn.nlark.com/yuque/0/2021/jpeg/1500604/1615998492170-c294084b-84d5-4537-87bb-b32da4bf0cd6.jpeg)
 
 那为什么写 CSS 代码写得好好的，偏偏要转去写“类 CSS”呢？这就和本来用 JS 也可以实现所有功能，但最后却写 React 的 jsx 或者 Vue 的模板语法一样——为了爽！要想知道有了预处理器有多爽，首先要知道的是传统 CSS 有多不爽。随着前端业务复杂度的提高，前端工程中对 CSS 提出了以下的诉求：
 
@@ -562,7 +560,6 @@ CSS 工程化是为了解决以下问题：
 
 PostCss 仍然是一个对 CSS 进行解析和处理的工具，它会对 CSS 做这样的事情：
 
-![img](https://cdn.nlark.com/yuque/0/2021/jpeg/1500604/1615998491947-34e3237c-e54f-4b1a-8aeb-3c38655e1cb0.jpeg?x-oss-process=image%2Fresize%2Cw_1038)
 
 它和预处理器的不同就在于，预处理器处理的是 类 CSS，而 PostCss 处理的就是 CSS 本身。Babel 可以将高版本的 JS 代码转换为低版本的 JS 代码。PostCss 做的是类似的事情：它可以编译尚未被浏览器广泛支持的先进的 CSS 语法，还可以自动为一些需要额外兼容的语法增加前缀。更强的是，由于 PostCss 有着强大的插件机制，支持各种各样的扩展，极大地强化了 CSS 的能力。
 
@@ -598,7 +595,6 @@ Webpack 能处理 CSS 吗：
 - `imgs.offsetTop` 是元素顶部距离文档顶部的高度（包括滚动条的距离）；
 - 内容达到显示区域的：`img.offsetTop < window.innerHeight + document.body.scrollTop;`
 
-![img](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603966605254-fe880ec0-ebd1-4f94-b662-cdd5e5396c34.png?x-oss-process=image%2Fresize%2Cw_800)
 
 ### 30. z-index 属性在什么情况下会失效
 
@@ -1182,19 +1178,11 @@ position 有以下属性值：
 
 前面三者的定位方式如下：
 
-- **relative：**元素的定位永远是相对于元素自身位置的，和其他元素没关系，也不会影响其他元素。
+- **relative**：元素的定位永远是相对于元素自身位置的，和其他元素没关系，也不会影响其他元素。
 
-![img](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603554694939-58dfe7f7-2fc9-45e5-9961-a953f95496a7.png#align=left&display=inline&height=105&margin=%5Bobject%20Object%5D&originHeight=105&originWidth=448&size=0&status=done&style=stroke&width=447)
+**fixed**：元素的定位是相对于 window （或者 iframe）边界的，和其他元素没有关系。但是它具有破坏性，会导致其他元素位置的变化。
 
-**fixed：**元素的定位是相对于 window （或者 iframe）边界的，和其他元素没有关系。但是它具有破坏性，会导致其他元素位置的变化。
-
-![img](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603554694841-89472ba9-b236-4098-802f-c3c26ff49466.png#align=left&display=inline&height=117&margin=%5Bobject%20Object%5D&originHeight=135&originWidth=516&size=0&status=done&style=stroke&width=446)
-
-**absolute：**元素的定位相对于前两者要复杂许多。如果为 absolute 设置了 top、left，浏览器会根据什么去确定它的纵向和横向的偏移量呢？答案是浏览器会递归查找该元素的所有父元素，如果找到一个设置了`position:relative/absolute/fixed`的元素，就以该元素为基准定位，如果没找到，就以浏览器边界定位。如下两个图所示：
-
-![img](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603554694882-589670e0-cd52-41d4-a3ed-4ebbdfc88f32.png#align=left&display=inline&height=142&margin=%5Bobject%20Object%5D&originHeight=183&originWidth=576&size=0&status=done&style=stroke&width=446)
-
-![img](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603554694842-2764d9ed-d5fe-45f4-8ede-34a73d237f94.png#align=left&display=inline&height=118&margin=%5Bobject%20Object%5D&originHeight=137&originWidth=516&size=0&status=done&style=stroke&width=446)
+**absolute**：元素的定位相对于前两者要复杂许多。如果为 absolute 设置了 top、left，浏览器会根据什么去确定它的纵向和横向的偏移量呢？答案是浏览器会递归查找该元素的所有父元素，如果找到一个设置了`position:relative/absolute/fixed`的元素，就以该元素为基准定位，如果没找到，就以浏览器边界定位。如下两个图所示：
 
 ### 7. **display、float、position 的关系**
 
