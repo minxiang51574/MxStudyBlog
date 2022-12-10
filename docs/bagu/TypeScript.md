@@ -6,12 +6,14 @@
 - 提高可维护性
 - 提高协同开发的效率
 - 支持强类型、接口、泛型、模块
+
+
 ## 1、手写体：使用TypeScript 实现一个 get 函数来获取它的属性值
-```
+```js
 const data = { name: 'tom', age: 18, address: 'xxx' }
 ```
-解答
-```
+
+```js
 const get = <T extends object, K extends keyof T>(obj: T, key: K): T[K] => {
   return obj[key]
 }
@@ -23,7 +25,7 @@ const get = <T extends object, K extends keyof T>(obj: T, key: K): T[K] => {
 
 ## 3、有用过ts中的 keyof 吗？
 将一个interface的所有key，汇聚成一个联合类型，可以用来对传入key的限制，比如：
-```
+```js
 interface Target {
   name: string,
   age: number
