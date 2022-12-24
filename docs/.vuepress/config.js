@@ -21,7 +21,7 @@ module.exports = {
 				lastUpdated: '上次更新',
 				nav: [
                     {
-                        text: '八股合集',
+                        text: '八股文大合集',
                         link: "/bagu/"
                     },
                     {
@@ -37,14 +37,6 @@ module.exports = {
                         link:'/vue/'
                     },
                     {
-                        text:'React',
-                        link:'/react/'
-                    },
-                    {
-                        text: 'React基础',
-                        link: '/reactBase/'
-                    },
-                    {
                         text: 'Node',
                         link: '/node/'
                     },
@@ -53,13 +45,9 @@ module.exports = {
                         link: '/test/'
                     },
                     {
-                        text:'算法',
-                        link:'/arithmetic/'
+                        text:'数据结构与算法',
+                        link:'/data/'
                     },
-                    // {
-                    //     text: '项目',
-                    //     link: '/items/'
-                    // },
 				],
 				sidebar: {
                     '/bagu/':[
@@ -74,7 +62,7 @@ module.exports = {
                         '代码输出',
                         'Vue',
                         'Vue优化',
-                        'LeetCode',
+                        'React',
                         'TypeScript'
                     ],
                     '/sourceCode/':[
@@ -93,7 +81,6 @@ module.exports = {
                         'JS执行机制',
                         'Promise',
                         'webpack'
-                        // 'exam'
                     ],
                     '/vue/': [
                         '',
@@ -105,15 +92,12 @@ module.exports = {
                     '/vueBase/': [
                         '',
                     ],
-                    '/react/': [
-                        '',
-                    ],
-                    '/reactBase/': [
-                        ''
-                    ],
                     '/node/': [],
                     '/test/': [],
-                    '/arithmetic/':[]
+                    '/data/':[
+                        '',
+                        'LeetCode'
+                    ]
 				}
 			}
 		}
