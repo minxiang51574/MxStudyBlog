@@ -21,8 +21,12 @@ module.exports = {
 				lastUpdated: '上次更新',
 				nav: [
                     {
-                        text: '八股文大合集',
+                        text: '八股文合集',
                         link: "/bagu/"
+                    },
+                    {
+                        text: '前端工程化',
+                        link: "/engineering/"
                     },
                     {
                         text: '源码系列',
@@ -32,18 +36,21 @@ module.exports = {
                         text: '前端基础',
                         link: "/base/"
                     },
+                    // blog
                     {
                         text:'Vue',
                         link:'/vue/'
                     },
+                    // blog
                     {
                         text: 'Node',
                         link: '/node/'
                     },
-                    {
-                        text: '大厂真题',
-                        link: '/test/'
-                    },
+                    // blog
+                    // {
+                    //     text: '大厂真题',
+                    //     link: '/test/'
+                    // },
                     {
                         text:'数据结构与算法',
                         link:'/data/'
@@ -58,19 +65,22 @@ module.exports = {
                         '浏览器原理',
                         '手写代码',
                         '性能优化',
-                        '前端工程化',
                         '代码输出',
                         'Vue',
                         'Vue优化',
                         'React',
                         'TypeScript'
                     ],
+                    '/engineering/':[
+                        '',
+                        'Webpack'
+                    ],
                     '/sourceCode/':[
                         '',
                         'Vue3',
+                        'Vuex',
                     ],
 					'/base/': [
-                        // '',
                         'HTTP',
                         'HTML',
 						'CSS',
@@ -80,13 +90,11 @@ module.exports = {
                         '缓存',
                         'JS执行机制',
                         'Promise',
-                        'webpack'
                     ],
                     '/vue/': [
                         '',
                         'Vue2',
                         'Vue3',
-                        'Vuex',
                         'Vite'
                     ],
                     '/vueBase/': [

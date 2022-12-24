@@ -1,4 +1,4 @@
-# Vuex
+# 三、Vuex
 ## 1、手写简易版Vuex
 > 实现入口文件，默认导出Store类和install方法
 
@@ -9,7 +9,7 @@ export default {
     install
 }
 export {
-    Store,
+    Store, 
     install
 }
 ```
