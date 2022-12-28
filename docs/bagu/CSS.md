@@ -1144,7 +1144,6 @@ clear 属性只有块级元素才有效的，而::after 等伪元素默认都是
 
 层叠顺序，英文称作 stacking order，表示元素发生层叠时有着特定的垂直显示顺序。下面是盒模型的层叠规则：
 
-![img](https://cdn.nlark.com/yuque/0/2020/png/1500604/1603553952688-ad155942-9d1d-4e4b-86a7-0f7dca46e6d1.png#align=left&display=inline&height=360&margin=%5Bobject%20Object%5D&originHeight=360&originWidth=600&size=0&status=done&style=shadow&width=600)
 
 对于上图，由上到下分别是：
 
