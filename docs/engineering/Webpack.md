@@ -1,4 +1,4 @@
-# 二、webpack
+# 二、Webpack
 
 ![dd](../images/webpack.png)
 

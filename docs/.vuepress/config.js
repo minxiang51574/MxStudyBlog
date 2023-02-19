@@ -73,7 +73,8 @@ module.exports = {
                     ],
                     '/engineering/':[
                         '',
-                        'Webpack'
+                        'Webpack',
+                        '设计模式'
                     ],
                     '/sourceCode/':[
                         '',
