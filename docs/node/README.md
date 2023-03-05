@@ -1,5 +1,6 @@
 # node
 ![dd](../images/node.png)
+
 ## 特点
 - 事件驱动 非阻塞I/O
 - 优点:
@@ -19,6 +20,8 @@ Node.js 也有它的局限性，它并不适合CPU密集型的任务，比如算
 > 实际上前两者可以归结为一种，即客户端广泛使用长连接，虽然并发数较高，但其中大部分是空闲连接。
 
 ## koa2
+
+
 koa2完全使用Promise并配合async来实现异步
 > 自己的小网站用koa实现接口编码[vue-admin-node](https://github.com/minxiang51574/vue-admin-node)
 附上接口示例编写流程。
