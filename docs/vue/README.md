@@ -41,7 +41,9 @@ Vue3.0 要使用 Proxy 替换原本的 API 原因在于 Proxy 无需一层层递
 
 ## 5.keep-alive
 keep-alive是Vue提供的一个抽象组件，主要用于保留组件状态或避免重新渲染
+```js
 <component :is='curremtView' keep-alive></component>
+```
 
 ## 6.nextTick用法
 在下次 DOM 更新循环结束之后执行延迟回调
@@ -123,6 +125,10 @@ v-model本质上就是语法糖，即利用v-model绑定数据后，其实就是
 ## 14.vue中key的原理？
 作用的话，便于diff算法的更新，key的唯一性，能让算法更快的找到需要更新的dom，需要注意的是，key要唯一，不然会出现很隐蔽性的更新问题。
 
+- 1.key的主要作用是为了更高效的更新虚拟Dom,其原理是vue在patch过程中通过key可以精准的判断两个节点
+是否是同一个，避免频繁更新不同的元素，会让整个patch过程更加高效，减少dom操作，提高性能。
+- 2.若不设置key还可能在列表更新引发一些隐藏的bug
+
 ## 15.使用vue渲染大量数据时应该怎么优化
 Object.freeze
 使用方式：this.item = Object.freeze(Object.assign({}, this.item))
@@ -203,3 +209,11 @@ vue2采用的是典型的混入式架构，各部分分模块开发，再通过�
 - 更易维护：Ts+模块化
 - 更加优化
 - 更容易使用
+
+
+## 28.v-if和v-for哪个优先级更高？同时出现 如何优化？
+> 源码位置 compiler/condegen/index.js
+
+- 1.显然v-for的优先级高于v-if (codegenindex源码中顺序为el.once > el.for > el.if)
+- 2.如果同时出现，每次渲染都会先执行循环在判断，循环不可避免，浪费性能
+- 3.将v-if提到外面一层，内部进行v-for循环

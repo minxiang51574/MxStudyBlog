@@ -236,6 +236,13 @@ var bind = Function.prototype.bind
 ### diff算法
 - 1.diff 只进行同级比较
 - 2.根据新老 node子节点不同情况分别处理
+ 
+- 3.diff算法是虚拟DOM的必然产物：通过新旧虚拟DOM作对比，将变化的地方更新在真实的DOM上，
+另外，也需要diff高效的执行对比过程。
+- 4.vue 2.x中为了降低Watcher粒度，每个组件只有一个watcher与之对应，只有引入diff才能精确找到
+变化的地方。
+- 5.vue中diff执行的时刻是组件实例执行其更新函数时，它会对比上一次渲染结果的oldVnode和新的渲染结果
+newVnode,此过程称为patch。
 
 ### patchVnode的规则
   ![dd](../images/patch.jpg)
@@ -426,7 +433,6 @@ export function queueWatcher(watcher) {
     // 进行异步调用
     nextTick(flushSchedulerQueue);
   }
-}
 }
 ```
 ```js
