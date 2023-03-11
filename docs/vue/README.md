@@ -217,3 +217,14 @@ vue2采用的是典型的混入式架构，各部分分模块开发，再通过�
 - 1.显然v-for的优先级高于v-if (codegenindex源码中顺序为el.once > el.for > el.if)
 - 2.如果同时出现，每次渲染都会先执行循环在判断，循环不可避免，浪费性能
 - 3.将v-if提到外面一层，内部进行v-for循环
+
+## 29.$mount挂载过程
+
+![mount1](../images/mount1.png)
+
+#### 精简的流程图
+![mount2](../images/mount2.png)
+
+#### 附上一份VUE的生命周期图，对照着整个挂载过程，一切都很清晰
+![mount3](../images/mount3.png)
+
