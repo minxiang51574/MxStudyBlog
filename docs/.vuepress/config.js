@@ -74,6 +74,7 @@ module.exports = {
                     '/engineering/':[
                         '',
                         'Webpack',
+                        'Vite',
                         '设计模式'
                     ],
                     '/sourceCode/':[
@@ -96,7 +97,6 @@ module.exports = {
                         '',
                         'Vue2',
                         'Vue3',
-                        'Vite'
                     ],
                     '/vueBase/': [
                         '',
