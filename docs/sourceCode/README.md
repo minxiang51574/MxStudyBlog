@@ -1599,16 +1599,874 @@ export function mountComponent(vm, el) {
 
 
 
+## 8、计算属性computed
+
+### 1.计算属性的初始化
+```js
+// src/state.js
+
+function initComputed(vm) {
+  const computed = vm.$options.computed;
+
+  const watchers = (vm._computedWatchers = {}); //用来存放计算watcher
+
+  for (let k in computed) {
+    const userDef = computed[k]; //获取用户定义的计算属性
+    const getter = typeof userDef === "function" ? userDef : userDef.get; //创建计算属性watcher使用
+    // 创建计算watcher  lazy设置为true
+    watchers[k] = new Watcher(vm, getter, () => {}, { lazy: true });
+    defineComputed(vm, k, userDef);
+  }
+}
+```
+计算属性可以写成一个函数也可以写成一个对象 对象的形式 get 属性就代表的是计算属性依赖的值 set 代表修改计算属性的依赖项的值 我们主要关心 get 属性 然后类似侦听属性 我们把 lazy:true 传给构造函数 Watcher 用来创建计算属性 Watcher 那么 defineComputed 是什么意思呢
+
+#### 2.对计算属性进行属性劫持
+```js
+//  src/state.js
+
+// 定义普通对象用来劫持计算属性
+const sharedPropertyDefinition = {
+  enumerable: true,
+  configurable: true,
+  get: () => {},
+  set: () => {},
+};
+
+// 重新定义计算属性  对get和set劫持
+function defineComputed(target, key, userDef) {
+  if (typeof userDef === "function") {
+    // 如果是一个函数  需要手动赋值到get上
+    sharedPropertyDefinition.get = createComputedGetter(key);
+  } else {
+    sharedPropertyDefinition.get = createComputedGetter(key);
+    sharedPropertyDefinition.set = userDef.set;
+  }
+  //   利用Object.defineProperty来对计算属性的get和set进行劫持
+  Object.defineProperty(target, key, sharedPropertyDefinition);
+}
+
+// 重写计算属性的get方法 来判断是否需要进行重新计算
+function createComputedGetter(key) {
+  return function () {
+    const watcher = this._computedWatchers[key]; //获取对应的计算属性watcher
+    if (watcher) {
+      if (watcher.dirty) {
+        watcher.evaluate(); //计算属性取值的时候 如果是脏的  需要重新求值
+      }
+      return watcher.value;
+    }
+  };
+}
+```
+defineComputed 方法主要是重新定义计算属性 其实最主要的是劫持 get 方法 也就是计算属性依赖的值 为啥要劫持呢 因为我们需要根据依赖值是否发生变化来判断计算属性是否需要重新计算
+createComputedGetter 方法就是判断计算属性依赖的值是否变化的核心了 我们在计算属性创建的 Watcher 增加 dirty 标志位 如果标志变为 true 代表需要调用 watcher.evaluate 来进行重新计算了
 
 
+### 3.Watcher 改造
+```js
+// src/observer/watcher.js
+
+// import { pushTarget, popTarget } from "./dep";
+// import { queueWatcher } from "./scheduler";
+// import {isObject} from '../util/index'
+// // 全局变量id  每次new Watcher都会自增
+// let id = 0;
+
+export default class Watcher {
+  constructor(vm, exprOrFn, cb, options) {
+    // this.vm = vm;
+    // this.exprOrFn = exprOrFn;
+    // this.cb = cb; //回调函数 比如在watcher更新之前可以执行beforeUpdate方法
+    // this.options = options; //额外的选项 true代表渲染watcher
+    // this.id = id++; // watcher的唯一标识
+    // this.deps = []; //存放dep的容器
+    // this.depsId = new Set(); //用来去重dep
+    // this.user = options.user; //标识用户watcher
+    this.lazy = options.lazy; //标识计算属性watcher
+    this.dirty = this.lazy; //dirty可变  表示计算watcher是否需要重新计算 默认值是true
+
+    // 如果表达式是一个函数
+    // if (typeof exprOrFn === "function") {
+    //   this.getter = exprOrFn;
+    // } else {
+    //   this.getter = function () {
+    //     //用户watcher传过来的可能是一个字符串   类似a.a.a.a.b
+    //     let path = exprOrFn.split(".");
+    //     let obj = vm;
+    //     for (let i = 0; i < path.length; i++) {
+    //       obj = obj[path[i]]; //vm.a.a.a.a.b
+    //     }
+    //     return obj;
+    //   };
+    // }
+    // 非计算属性实例化就会默认调用get方法 进行取值  保留结果 计算属性实例化的时候不会去调用get
+    this.value = this.lazy ? undefined : this.get();
+  }
+  get() {
+    pushTarget(this); // 在调用方法之前先把当前watcher实例推到全局Dep.target上
+    const res = this.getter.call(this.vm); //计算属性在这里执行用户定义的get函数 访问计算属性的依赖项 从而把自身计算Watcher添加到依赖项dep里面收集起来
+    popTarget(); // 在调用方法之后把当前watcher实例从全局Dep.target移除
+    return res;
+  }
+  //   把dep放到deps里面 同时保证同一个dep只被保存到watcher一次  同样的  同一个watcher也只会保存在dep一次
+  //   addDep(dep) {
+  //     let id = dep.id;
+  //     if (!this.depsId.has(id)) {
+  //       this.depsId.add(id);
+  //       this.deps.push(dep);
+  //       //   直接调用dep的addSub方法  把自己--watcher实例添加到dep的subs容器里面
+  //       dep.addSub(this);
+  //     }
+  //   }
+  //   这里简单的就执行以下get方法  之后涉及到计算属性就不一样了
+  update() {
+    // 计算属性依赖的值发生变化 只需要把dirty置为true  下次访问到了重新计算
+    if (this.lazy) {
+      this.dirty = true;
+    } else {
+      // 每次watcher进行更新的时候  可以让他们先缓存起来  之后再一起调用
+      // 异步队列机制
+      queueWatcher(this);
+    }
+  }
+  //   计算属性重新进行计算 并且计算完成把dirty置为false
+  evaluate() {
+    this.value = this.get();
+    this.dirty = false;
+  }
+  depend() {
+    // 计算属性的watcher存储了依赖项的dep
+    let i = this.deps.length;
+    while (i--) {
+      this.deps[i].depend(); //调用依赖项的dep去收集渲染watcher
+    }
+  }
+  //   run() {
+  //     const newVal = this.get(); //新值
+  //     const oldVal = this.value; //老值
+  //     this.value = newVal; //跟着之后  老值就成为了现在的值
+  //     if (this.user) {
+  //       if(newVal!==oldVal||isObject(newVal)){
+  //         this.cb.call(this.vm, newVal, oldVal);
+  //       }
+  //     } else {
+  //       // 渲染watcher
+  //       this.cb.call(this.vm);
+  //     }
+  //   }
+}
+```
+- 1.实例化的时候如果是计算属性 不会去调用 get 方法访问值进行依赖收集
+- 2.update 方法只是把计算 watcher 的 dirty 标识为 true 只有当下次访问到了计算属性的时候才会重新计算
+- 3.新增 evaluate 方法专门用于计算属性重新计算
+- 4.新增 depend 方法 让计算属性的依赖值收集外层 watcher--这个方法非常重要 我们接下来分析
 
 
+#### 4.外层 Watcher 的依赖收集
+```js
+// src/state.js
+
+function createComputedGetter(key) {
+//   return function () {
+//     const watcher = this._computedWatchers[key]; //获取对应的计算属性watcher
+//     if (watcher) {
+//       if (watcher.dirty) {
+//         watcher.evaluate(); //计算属性取值的时候 如果是脏的  需要重新求值
+        if (Dep.target) {
+    // 如果Dep还存在target 这个时候一般为渲染watcher 计算属性依赖的数据也需要收集
+          watcher.depend()
+        }
+//       }
+//       return watcher.value;
+//     }
+//   };
+}
+
+```
+这里就体现了 watcher.depend 方法的重要性了 我们试想一下 当我们计算属性依赖的值发生了改变 这时候 watcher 的 dirty 为 true 下次访问计算属性 他确实也重新计算了 但是 我们从头到尾都没有触发视图更新 也就是数据改变了 视图没有重新渲染
+这是为什么呢？
+因为模板里面只有计算属性 而计算属性的依赖值的 dep 里面只收集了计算 watcher 的依赖 自身变化也只是通知了计算 watcher 调用 update 把 dirty 置为 true 所以我们要想个办法把计算属性的依赖项也添加渲染 watcher 的依赖 让自身变化之后首先通知计算 watcher 进行重新计算 然后通知渲染 watcher 进行视图更新
+怎么做呢？我们来看看下面的代码就清楚了
+```js
+// src/observer/dep.js
+
+// 默认Dep.target为null
+Dep.target = null;
+// 栈结构用来存watcher
+const targetStack = [];
+
+export function pushTarget(watcher) {
+  targetStack.push(watcher);
+  Dep.target = watcher; // Dep.target指向当前watcher
+}
+export function popTarget() {
+  targetStack.pop(); // 当前watcher出栈 拿到上一个watcher
+  Dep.target = targetStack[targetStack.length - 1];
+}
+```
+可见最初设计存放 watcher 的容器就是一个栈结构 因为整个 Vue 生命周期的过程中会存在很多的 watcher 比如渲染 watcher 计算 watcher 侦听 watcher 等 而每个 watcher 在调用了自身的 get 方法前后会分别调用 pushTarget 入栈和 popTarget 出栈 这样子当计算属性重新计算之后就立马会出栈 那么外层的 watcher 就会成为新的 Dep.target 我们使用 watcher.depend 方法让计算属性依赖的值收集一遍外层的渲染 watcher 这样子当计算属性依赖的值改变了既可以重新计算又可以刷新视图
+
+![dd](../images/computed.png)
+
+## 9、侦听属性watch
+
+### 1.侦听属性的初始化
+```js
+// src/state.js
+
+// 统一初始化数据的方法
+export function initState(vm) {
+  // 获取传入的数据对象
+  const opts = vm.$options;
+  if (opts.watch) {
+    //侦听属性初始化
+    initWatch(vm);
+  }
+}
+
+// 初始化watch
+function initWatch(vm) {
+  let watch = vm.$options.watch;
+  for (let k in watch) {
+    const handler = watch[k]; //用户自定义watch的写法可能是数组 对象 函数 字符串
+    if (Array.isArray(handler)) {
+      // 如果是数组就遍历进行创建
+      handler.forEach((handle) => {
+        createWatcher(vm, k, handle);
+      });
+    } else {
+      createWatcher(vm, k, handler);
+    }
+  }
+}
+// 创建watcher的核心
+function createWatcher(vm, exprOrFn, handler, options = {}) {
+  if (typeof handler === "object") {
+    options = handler; //保存用户传入的对象
+    handler = handler.handler; //这个代表真正用户传入的函数
+  }
+  if (typeof handler === "string") {
+    //   代表传入的是定义好的methods方法
+    handler = vm[handler];
+  }
+  //   调用vm.$watch创建用户watcher
+  return vm.$watch(exprOrFn, handler, options);
+}
+```
+initWatch初始化Watch对数组进行处理 createWatcher处理Watch的兼容性写法 包含字符串 函数 数组 以及对象 最后调用$watch 传入处理好的参数进行创建用户Watcher
+
+### 2.$watch
+```js
+//  src/state.js
+import Watcher from "./observer/watcher";
+Vue.prototype.$watch = function (exprOrFn, cb, options) {
+  const vm = this;
+  //  user: true 这里表示是一个用户watcher
+  let watcher = new Watcher(vm, exprOrFn, cb, { ...options, user: true });
+  // 如果有immediate属性 代表需要立即执行回调
+  if (options.immediate) {
+    cb(); //如果立刻执行
+  }
+};
+```
+### 3.Watcher 改造
+```js
+// src/observer/watcher.js
+
+import { isObject } from "../util/index";
+export default class Watcher {
+  constructor(vm, exprOrFn, cb, options) {
+    // this.vm = vm;
+    // this.exprOrFn = exprOrFn;
+    // this.cb = cb; //回调函数 比如在watcher更新之前可以执行beforeUpdate方法
+    // this.options = options; //额外的选项 true代表渲染watcher
+    // this.id = id++; // watcher的唯一标识
+    // this.deps = []; //存放dep的容器
+    // this.depsId = new Set(); //用来去重dep
+
+    this.user = options.user; //标识用户watcher
+
+    // 如果表达式是一个函数
+    if (typeof exprOrFn === "function") {
+      this.getter = exprOrFn;
+    } else {
+      this.getter = function () {
+        //用户watcher传过来的可能是一个字符串   类似a.a.a.a.b
+        let path = exprOrFn.split(".");
+        let obj = vm;
+        for (let i = 0; i < path.length; i++) {
+          obj = obj[path[i]]; //vm.a.a.a.a.b
+        }
+        return obj;
+      };
+    }
+    // 实例化就进行一次取值操作 进行依赖收集过程
+    this.value = this.get();
+  }
+  //   get() {
+  //     pushTarget(this); // 在调用方法之前先把当前watcher实例推到全局Dep.target上
+  //     const res = this.getter.call(this.vm); //如果watcher是渲染watcher 那么就相当于执行  vm._update(vm._render()) 这个方法在render函数执行的时候会取值 从而实现依赖收集
+  //     popTarget(); // 在调用方法之后把当前watcher实例从全局Dep.target移除
+  //     return res;
+  //   }
+  //   把dep放到deps里面 同时保证同一个dep只被保存到watcher一次  同样的  同一个watcher也只会保存在dep一次
+  //   addDep(dep) {
+  //     let id = dep.id;
+  //     if (!this.depsId.has(id)) {
+  //       this.depsId.add(id);
+  //       this.deps.push(dep);
+  //       //   直接调用dep的addSub方法  把自己--watcher实例添加到dep的subs容器里面
+  //       dep.addSub(this);
+  //     }
+  //   }
+  //   这里简单的就执行以下get方法  之后涉及到计算属性就不一样了
+  //   update() {
+  //     // 计算属性依赖的值发生变化 只需要把dirty置为true  下次访问到了重新计算
+  //     if (this.lazy) {
+  //       this.dirty = true;
+  //     }else{
+  //       // 每次watcher进行更新的时候  可以让他们先缓存起来  之后再一起调用
+  //       // 异步队列机制
+  //       queueWatcher(this);
+  //     }
+  //   }
+  //   depend(){
+  //     // 计算属性的watcher存储了依赖项的dep
+  //     let i=this.deps.length
+  //     while(i--){
+  //       this.deps[i].depend() //调用依赖项的dep去收集渲染watcher
+  //     }
+  //   }
+  run() {
+    const newVal = this.get(); //新值
+    const oldVal = this.value; //老值
+    this.value = newVal; //现在的新值将成为下一次变化的老值
+    if (this.user) {
+      // 如果两次的值不相同  或者值是引用类型 因为引用类型新老值是相等的 他们是指向同一引用地址
+      if (newVal !== oldVal || isObject(newVal)) {
+        this.cb.call(this.vm, newVal, oldVal);
+      }
+    } else {
+      // 渲染watcher
+      this.cb.call(this.vm);
+    }
+  }
+}
+```
+- 1.实例化的时候为了兼容用户 watch 的写法 会将传入的字符串写法转成 Vue 实例对应的值 并且调用 get 方法获取并保存一次旧值
+- 2.run 方法判断如果是用户 watch 那么执行用户传入的回调函数 cb 并且把新值和旧值作为参数传入进去
+  ![watch](../images/watch.png)
+
+## 10、组件原理
+
+### 1.全局组件注册
+```js
+// src/global-api/index.js
+
+import initExtend from "./initExtend";
+import initAssetRegisters from "./assets";
+const ASSETS_TYPE = ["component", "directive", "filter"];
+export function initGlobalApi(Vue) {
+  Vue.options = {}; // 全局的组件 指令 过滤器
+  ASSETS_TYPE.forEach((type) => {
+    Vue.options[type + "s"] = {};
+  });
+  Vue.options._base = Vue; //_base指向Vue
+
+  initExtend(Vue); // extend方法定义
+  initAssetRegisters(Vue); //assets注册方法 包含组件 指令和过滤器
+}
+```
+initGlobalApi方法主要用来注册Vue的全局方法 比如之前写的Vue.Mixin 和今天的Vue.extend Vue.component等
+```js
+// src/global-api/asset.js
+
+const ASSETS_TYPE = ["component", "directive", "filter"];
+export default function initAssetRegisters(Vue) {
+  ASSETS_TYPE.forEach((type) => {
+    Vue[type] = function (id, definition) {
+      if (type === "component") {
+        //   this指向Vue
+        // 全局组件注册
+        // 子组件可能也有extend方法  VueComponent.component方法
+        definition = this.options._base.extend(definition);
+      }
+      this.options[type + "s"][id] = definition;
+    };
+  });
+}
+```
+this.options._base 就是指代 Vue 可见所谓的全局组件就是使用 Vue.extend 方法把传入的选项处理之后挂载到了 Vue.options.components 上面
+
+### 2.Vue.extend 定义
+```js
+//  src/global-api/initExtend.js
+
+import { mergeOptions } from "../util/index";
+export default function initExtend(Vue) {
+  let cid = 0; //组件的唯一标识
+  // 创建子类继承Vue父类 便于属性扩展
+  Vue.extend = function (extendOptions) {
+    // 创建子类的构造函数 并且调用初始化方法
+    const Sub = function VueComponent(options) {
+      this._init(options); //调用Vue初始化方法
+    };
+    Sub.cid = cid++;
+    Sub.prototype = Object.create(this.prototype); // 子类原型指向父类
+    Sub.prototype.constructor = Sub; //constructor指向自己
+    Sub.options = mergeOptions(this.options, extendOptions); //合并自己的options和父类的options
+    return Sub;
+  };
+}
+```
+Vue.extend 核心思路就是使用原型继承的方法返回了 Vue 的子类 并且利用 mergeOptions 把传入组件的 options 和父类的 options 进行了合并
+
+### 3.组件的合并策略
+```js
+// src/init.js
+
+Vue.prototype._init = function (options) {
+  const vm = this;
+  vm.$options = mergeOptions(vm.constructor.options, options); //合并options
+};
+```
+
+还记得我们 Vue 初始化的时候合并 options 吗 全局组件挂载在 Vue.options.components 上 局部组件也定义在自己的 options.components 上面 那我们怎么处理全局组件和局部组件的合并呢
+
+```js
+// src/util/index.js
+
+const ASSETS_TYPE = ["component", "directive", "filter"];
+// 组件 指令 过滤器的合并策略
+function mergeAssets(parentVal, childVal) {
+  const res = Object.create(parentVal); //比如有同名的全局组件和自己定义的局部组件 那么parentVal代表全局组件 自己定义的组件是childVal  首先会查找自已局部组件有就用自己的  没有就从原型继承全局组件  res.__proto__===parentVal
+  if (childVal) {
+    for (let k in childVal) {
+      res[k] = childVal[k];
+    }
+  }
+  return res;
+}
+
+// 定义组件的合并策略
+ASSETS_TYPE.forEach((type) => {
+  strats[type + "s"] = mergeAssets;
+});
+```
+这里又使用到了原型继承的方式来进行组件合并 组件内部优先查找自己局部定义的组件 找不到会向上查找原型中定义的组件
+
+### 4.创建组件 Vnode
+```js
+// src/util/index.js
+
+export function isObject(data) {
+  //判断是否是对象
+  if (typeof data !== "object" || data == null) {
+    return false;
+  }
+  return true;
+}
+
+export function isReservedTag(tagName) {
+  //判断是不是常规html标签
+  // 定义常见标签
+  let str =
+    "html,body,base,head,link,meta,style,title," +
+    "address,article,aside,footer,header,h1,h2,h3,h4,h5,h6,hgroup,nav,section," +
+    "div,dd,dl,dt,figcaption,figure,picture,hr,img,li,main,ol,p,pre,ul," +
+    "a,b,abbr,bdi,bdo,br,cite,code,data,dfn,em,i,kbd,mark,q,rp,rt,rtc,ruby," +
+    "s,samp,small,span,strong,sub,sup,time,u,var,wbr,area,audio,map,track,video," +
+    "embed,object,param,source,canvas,script,noscript,del,ins," +
+    "caption,col,colgroup,table,thead,tbody,td,th,tr," +
+    "button,datalist,fieldset,form,input,label,legend,meter,optgroup,option," +
+    "output,progress,select,textarea," +
+    "details,dialog,menu,menuitem,summary," +
+    "content,element,shadow,template,blockquote,iframe,tfoot";
+  let obj = {};
+  str.split(",").forEach((tag) => {
+    obj[tag] = true;
+  });
+  return obj[tagName];
+}
+```
+上诉是公用工具方法 在创建组件 Vnode 过程会用到
+
+```js
+// src/vdom/index.js
+
+import { isObject, isReservedTag } from "../util/index";
+// 创建元素vnode 等于render函数里面的 h=>h(App)
+export function createElement(vm, tag, data = {}, ...children) {
+  let key = data.key;
+
+  if (isReservedTag(tag)) {
+    // 如果是普通标签
+    return new Vnode(tag, data, key, children);
+  } else {
+    // 否则就是组件
+    let Ctor = vm.$options.components[tag]; //获取组件的构造函数
+    return createComponent(vm, tag, data, key, children, Ctor);
+  }
+}
+
+function createComponent(vm, tag, data, key, children, Ctor) {
+  if (isObject(Ctor)) {
+    //   如果没有被改造成构造函数
+    Ctor = vm.$options._base.extend(Ctor);
+  }
+  // 声明组件自己内部的生命周期
+  data.hook = {
+    // 组件创建过程的自身初始化方法
+    init(vnode) {
+      let child = (vnode.componentInstance = new Ctor({ _isComponent: true })); //实例化组件
+      child.$mount(); //因为没有传入el属性  需要手动挂载 为了在组件实例上面增加$el方法可用于生成组件的真实渲染节点
+    },
+  };
+
+  // 组件vnode  也叫占位符vnode  ==> $vnode
+  return new Vnode(
+    `vue-component-${Ctor.cid}-${tag}`,
+    data,
+    key,
+    undefined,
+    undefined,
+    {
+      Ctor,
+      children,
+    }
+  );
+}
+```
+改写 createElement 方法 对于非普通 html 标签 就需要生成组件 Vnode 把 Ctor 和 children 作为 Vnode 最后一个参数 componentOptions 传入
+这里需要注意组件的 data.hook.init 方法 我们手动调用 child.$mount()方法 此方法可以生成组件的真实 dom 并且挂载到自身的 $el 属性上面 
+
+### 5.渲染组件真实节点
+
+```js
+// src/vdom/patch.js
+
+// patch用来渲染和更新视图
+export function patch(oldVnode, vnode) {
+  if (!oldVnode) {
+    // 组件的创建过程是没有el属性的
+    return createElm(vnode);
+  } else {
+    //   非组件创建过程省略
+  }
+}
+
+// 判断是否是组件Vnode
+function createComponent(vnode) {
+  // 初始化组件
+  // 创建组件实例
+  let i = vnode.data;
+  //   下面这句话很关键 调用组件data.hook.init方法进行组件初始化过程 最终组件的vnode.componentInstance.$el就是组件渲染好的真实dom
+  if ((i = i.hook) && (i = i.init)) {
+    i(vnode);
+  }
+  // 如果组件实例化完毕有componentInstance属性 那证明是组件
+  if (vnode.componentInstance) {
+    return true;
+  }
+}
+
+// 虚拟dom转成真实dom
+function createElm(vnode) {
+  const { tag, data, key, children, text } = vnode;
+  //   判断虚拟dom 是元素节点还是文本节点
+  if (typeof tag === "string") {
+    if (createComponent(vnode)) {
+      // 如果是组件 返回真实组件渲染的真实dom
+      return vnode.componentInstance.$el;
+    }
+    //   虚拟dom的el属性指向真实dom 方便后续更新diff算法操作
+    vnode.el = document.createElement(tag);
+    // 解析虚拟dom属性
+    updateProperties(vnode);
+    // 如果有子节点就递归插入到父节点里面
+    children.forEach((child) => {
+      return vnode.el.appendChild(createElm(child));
+    });
+  } else {
+    //   文本节点
+    vnode.el = document.createTextNode(text);
+  }
+  return vnode.el;
+}
+```
+![component](../images/component.png)
+
+## 11、全局api
+### 1.Vue.util
+```js
+// src/global-api/index.js
+
+// exposed util methods.
+// NOTE: these are not considered part of the public API - avoid relying on
+// them unless you are aware of the risk.
+Vue.util = {
+  warn,
+  extend,
+  mergeOptions,
+  defineReactive,
+};
+```
+Vue.util 是 Vue 内部的工具方法 不推荐业务组件去使用 因为可能随着版本发生变动 如果咱们不开发第三方 Vue 插件确实使用会比较
+
+### 2.Vue.set / Vue.delete
+```js
+export function set(target: Array<any> | Object, key: any, val: any): any {
+  // 如果是数组 直接调用我们重写的splice方法 可以刷新视图
+  if (Array.isArray(target) && isValidArrayIndex(key)) {
+    target.length = Math.max(target.length, key);
+    target.splice(key, 1, val);
+    return val;
+  }
+  // 如果是对象本身的属性，则直接添加即可
+  if (key in target && !(key in Object.prototype)) {
+    target[key] = val;
+    return val;
+  }
+  const ob = (target: any).__ob__;
+
+  // 如果对象本身就不是响应式 不需要将其定义成响应式属性
+  if (!ob) {
+    target[key] = val;
+    return val;
+  }
+  // 利用defineReactive   实际就是Object.defineProperty 将新增的属性定义成响应式的
+  defineReactive(ob.value, key, val);
+  ob.dep.notify(); // 通知视图更新
+  return val;
+}
+```
+
+```js
+export function del(target: Array<any> | Object, key: any) {
+  // 如果是数组依旧调用splice方法
+  if (Array.isArray(target) && isValidArrayIndex(key)) {
+    target.splice(key, 1);
+    return;
+  }
+  const ob = (target: any).__ob__;
+  // 如果对象本身就没有这个属性 什么都不做
+  if (!hasOwn(target, key)) {
+    return;
+  }
+  // 直接使用delete  删除这个属性
+  delete target[key];
+  //   如果对象本身就不是响应式 直接返回
+  if (!ob) {
+    return;
+  }
+  ob.dep.notify(); //通知视图更新
+}
+```
+这两个 api 其实在实际业务场景使用还是很多的 set 方法用来新增响应式数据 delete 方法用来删除响应式数据 因为 Vue 整个响应式过程是依赖 Object.defineProperty 这一底层 api 的 但是这个 api 只能对当前已经声明过的对象属性进行劫持 所以新增的属性不是响应式数据 另外直接修改数组下标也不会引发视图更新 这个是考虑到性能原因 所以我们需要使用$set 和$delete 来进行操作
 
 
+### 3.Vue.nextTick
+```js
+let callbacks = []; //回调函数
+let pending = false;
+function flushCallbacks() {
+  pending = false; //把标志还原为false
+  // 依次执行回调
+  for (let i = 0; i < callbacks.length; i++) {
+    callbacks[i]();
+  }
+}
+let timerFunc; //先采用微任务并按照优先级优雅降级的方式实现异步刷新
+if (typeof Promise !== "undefined") {
+  // 如果支持promise
+  const p = Promise.resolve();
+  timerFunc = () => {
+    p.then(flushCallbacks);
+  };
+} else if (typeof MutationObserver !== "undefined") {
+  // MutationObserver 主要是监听dom变化 也是一个异步方法
+  let counter = 1;
+  const observer = new MutationObserver(flushCallbacks);
+  const textNode = document.createTextNode(String(counter));
+  observer.observe(textNode, {
+    characterData: true,
+  });
+  timerFunc = () => {
+    counter = (counter + 1) % 2;
+    textNode.data = String(counter);
+  };
+} else if (typeof setImmediate !== "undefined") {
+  // 如果前面都不支持 判断setImmediate
+  timerFunc = () => {
+    setImmediate(flushCallbacks);
+  };
+} else {
+  // 最后降级采用setTimeout
+  timerFunc = () => {
+    setTimeout(flushCallbacks, 0);
+  };
+}
 
+export function nextTick(cb) {
+  // 除了渲染watcher  还有用户自己手动调用的nextTick 一起被收集到数组
+  callbacks.push(cb);
+  if (!pending) {
+    // 如果多次调用nextTick  只会执行一次异步 等异步队列清空之后再把标志变为false
+    pending = true;
+    timerFunc();
+  }
+}
 
+```
+nextTick 是 Vue 实现异步更新的核心 此 api 在实际业务使用频次也很高 一般用作在数据改变之后立马要获取 dom 节点相关的属性 那么就可以把这样的方法放在 nextTick 中去实现 异步更新原理可以看**异步更新原理**
 
+### 4.Vue.observable
+```js
+Vue.observable = <T>(obj: T): T => {
+  observe(obj);
+  return obj;
+};
+```
+核心就是调用 observe 方法将传入的数据变成响应式对象 可用于制造全局变量在组件共享数据
 
+### 5.Vue.options
+```js
+Vue.options = Object.create(null);
+ASSET_TYPES.forEach((type) => {
+  Vue.options[type + "s"] = Object.create(null);
+});
 
+// this is used to identify the "base" constructor to extend all plain-object
+// components with in Weex's multi-instance scenarios.
+Vue.options._base = Vue;
 
+extend(Vue.options.components, builtInComponents); //内置组件
+```
 
+### 6.Vue.use
+```js
+Vue.use = function (plugin: Function | Object) {
+  const installedPlugins =
+    this._installedPlugins || (this._installedPlugins = []);
+  if (installedPlugins.indexOf(plugin) > -1) {
+    // 如果安装过这个插件直接返回
+    return this;
+  }
+
+  const args = toArray(arguments, 1); // 获取参数
+  args.unshift(this); //在参数中增加Vue构造函数
+
+  if (typeof plugin.install === "function") {
+    plugin.install.apply(plugin, args); // 执行install方法
+  } else if (typeof plugin === "function") {
+    plugin.apply(null, args); // 没有install方法直接把传入的插件执行
+  }
+  // 记录安装的插件
+  installedPlugins.push(plugin);
+  return this;
+};
+```
+Vue.use 主要用于插件的注册 调用插件的 install 方法 并且把自身 Vue 传到插件的 install 方法 这样可以避免第三方插件强依赖 Vue
+
+### 7.Vue.mixin
+```js
+export function initMixin(Vue: GlobalAPI) {
+  Vue.mixin = function (mixin: Object) {
+    this.options = mergeOptions(this.options, mixin); //只要调用mergeOptions来合并选项
+    return this;
+  };
+}
+
+/**
+ * Merge two option objects into a new one.
+ * Core utility used in both instantiation and inheritance.
+ */
+export function mergeOptions(
+  parent: Object,
+  child: Object,
+  vm?: Component
+): Object {
+  if (!child._base) {
+    //   这个代表是组件  需要先把自己定义的extends和mixins与父级属性进行合并
+    if (child.extends) {
+      parent = mergeOptions(parent, child.extends, vm);
+    }
+    if (child.mixins) {
+      for (let i = 0, l = child.mixins.length; i < l; i++) {
+        parent = mergeOptions(parent, child.mixins[i], vm);
+      }
+    }
+  }
+
+  // 把自己的和父亲的属性进行合并
+  const options = {};
+  let key;
+  for (key in parent) {
+    mergeField(key);
+  }
+  for (key in child) {
+    if (!hasOwn(parent, key)) {
+      mergeField(key);
+    }
+  }
+  function mergeField(key) {
+    //真正合并字段的方法
+    const strat = strats[key] || defaultStrat; //strats代表合并策略 会优先查找对应的合并策略 找不到就用默认的合并策略
+    options[key] = strat(parent[key], child[key], vm, key);
+  }
+  return options;
+}
+```
+Vue.mixin 是全局混入方法 一般用作提取全局的公共方法和属性
+
+### 8.Vue.extend
+```js
+Vue.extend = function (extendOptions: Object): Function {
+  const Sub = function VueComponent(options) {
+    // 创建子类的构造函数 并且调用初始化方法
+    this._init(options);
+  };
+  Sub.prototype = Object.create(Super.prototype); // 子类原型指向父类
+  Sub.prototype.constructor = Sub; //constructor指向自己
+  Sub.options = mergeOptions(
+    //合并自己的options和父类的options
+    Super.options,
+    extendOptions
+  );
+  return Sub;
+};
+```
+Vue.extend 被称为组件构造器 Vue 的组件创建就是依赖于此 api 其实就是利用原型继承的方式创建继承自 Vue 的子类
+
+### 9.组件、指令、过滤器
+```js
+export function initAssetRegisters(Vue: GlobalAPI) {
+  var ASSET_TYPES = ["component", "directive", "filter"];
+  /**
+   * Create asset registration methods.
+   */
+  ASSET_TYPES.forEach((type) => {
+    Vue[type] = function (
+      id: string,
+      definition: Function | Object
+    ): Function | Object | void {
+      if (!definition) {
+        return this.options[type + "s"][id];
+      } else {
+        if (type === "component" && isPlainObject(definition)) {
+          definition.name = definition.name || id;
+          definition = this.options._base.extend(definition);
+        }
+        if (type === "directive" && typeof definition === "function") {
+          definition = { bind: definition, update: definition };
+        }
+        this.options[type + "s"][id] = definition; //把组件  指令  过滤器 放到Vue.options中
+        return definition;
+      }
+    };
+  });
+}
+```
+定义 Vue.component Vue.directive Vue.filter 三大 api 并且格式化用户传入内容 最后把结果放到 Vue.options 中
+![api](../images/api.png)
