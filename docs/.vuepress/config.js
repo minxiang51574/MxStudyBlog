@@ -87,7 +87,6 @@ module.exports = {
                         'HTML',
 						'CSS',
                         'JS',
-                        'ES6',
                         '数组',
                         '缓存',
                         'JS执行机制',

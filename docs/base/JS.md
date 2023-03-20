@@ -183,7 +183,7 @@ var obj = {
     return fn();
   }
 };
-console.log(obj.getAge()); //underfined
+console.log(obj.getAge()); //undefined
 
 //1.that 来接盘 this
 
@@ -810,3 +810,143 @@ example(fn); // 我是主函数 我是回调函数
 > - 垃圾回收器会在运行的时候给存储在内存中的所有变量加上标记，然后去掉环境中的变量以及被环境中变量所引用的变量（闭包），在这些完成之后仍存在标记的就是要删除的变量了
 - 引用计数(reference counting)
 > 在低版本IE中经常会出现内存泄露，很多时候就是因为其采用引用计数方式进行垃圾回收。引用计数的策略是跟踪记录每个值被使用的次数，当声明了一个 变量并将一个引用类型赋值给该变量的时候这个值的引用次数就加1，如果该变量的值变成了另外一个，则这个值得引用次数减1，当这个值的引用次数变为0的时 候，说明没有变量在使用，这个值没法被访问了，因此可以将其占用的空间回收，这样垃圾回收器会在运行的时候清理掉引用次数为0的值占用的空间
+
+
+## 2、箭头函数
+
+### 箭头函数和普通函数的区别？
+- 1.改变this的指向，会捕获其所在的上下文的this值，作为自己的this值
+- 2.箭头是匿名函数，不能作为构造函数，不能使用new。
+- 3.箭头函数不绑定arguments，取而代之用rest参数...解决
+- 4.箭头函数没有原型属性
+
+### 箭头函数在什么情况下不适用
+- 1.定义对象的方法时
+- 2.定义原型方式时
+- 3.构造函数 
+
+
+## 4、Set、Map
+
+### Set
+```js
+const set = new Set([1, 2, 3, 4, 4]);
+[...set]
+// [1, 2, 3, 4]
+```
+#### 常用方法
+> add、delete、has、clear
+
+#### WeakSet 
+- WeakSet 的成员只能是对象
+- WeakSet 中的对象都是弱引用，即垃圾回收机制不考虑 WeakSet 对该对象的引用
+
+### Map
+```js
+const map = new Map([
+  ['name', '张三'],
+  ['title', 'Author']
+]);
+
+map.size // 2
+map.has('name') // true
+map.get('name') // "张三"
+map.has('title') // true
+map.get('title') // "Author"
+```
+
+#### 常用方法
+> set、get、delete、has、clear
+
+#### WeakSet 
+- WeakMap只接受对象作为键名
+- WeakMap的键名所指向的对象，不计入垃圾回收机制
+## 5、Promise
+
+**Promise**是ES6推出的异步编程的一种解决方案。**解决了回调地狱问题，提高了代码的可读性,状态不可逆**，一旦改变则不会再变了；
+常用的方法有resolve、reject、then、catch、race、all、allSettled、any、finally。then()方法会返回一个新的Promise实例，所以能够连续then
+
+```js
+//实例
+function runAsyns() {
+  var p = new Promise(function(resolve, reject) {
+    //做一些异步操作
+    setTimeout(function() {
+      resolve("数据1");
+    }, 2000);
+  });
+  return p;
+}
+
+runAsyns()
+  .then(val => {
+    console.log(val); // 数据1
+    return new Promise(function(resolve, reject) {
+      resolve("数据2");
+    });
+  })
+  .then(val => {
+    console.log(val); // 数据2
+    return new Promise((resolve, reject) => {
+      resolve("数据3");
+    });
+  })
+  .then(val => {
+    console.log(val); // 数据3
+  });
+```
+
+### async await
+
+async/await:是用同步的方式执行异步的操作，generator+Promise的语法糖;它的实现原理，利用Promise嵌套，再加上generator函数的步骤控制，实现了按顺序执行异步操作的效果；
+> async函数返回的是一个Promise,正常情况下，await命令后面是一个 Promise 对象，返回该对象的结果。如果不是 Promise 对象，就直接返回对应的值。
+```js 
+   //先看一段代码
+   //单一的 Promise 链并不能发现 async/await 的优势，但是，如果需要处理由多个 Promise 组成的 then 链的时候，优势就能体现出来了（很有意思，Promise 通过 then 链来解决多层回调的问题，现在又用 async/await 来进一步优化它）。
+  function takeTime(n){
+        return new Promise((resolve,reject)=>{
+            setTimeout(() => {
+                resolve( (n+200),n)
+            }, 1000);
+        })
+    }
+    function step1(n) {
+            console.log(`step1 with ${n}`);
+            return takeTime(n);
+        }
+
+        function step2(n) {
+            console.log(`step2 with ${n}`);
+            return takeTime(n);
+        }
+
+        function step3(n) {
+            console.log(`step3 with ${n}`);
+            return takeTime(n);
+      }
+        function step3(n) {
+            console.log(`step3 with ${n}`);
+            return takeTime(n);
+      }
+      function doIt(){
+         console.time("doIt");
+         const time1 = 300;
+         step1(time1)
+         .then(v => step2(v))
+         .then(v => step3(v))
+         .then(result=>{
+             console.log(result,'end')
+         })
+      }
+     doIt()
+
+     async function doIt2(){
+         console.time("doIt2");
+         const time1 = 300;
+         const time2 = await step1(time1);
+         const time3 = await step2(time2);
+         const result = await step3(time3);
+         console.log(result, 'end')
+     }
+    doIt2()
+```
