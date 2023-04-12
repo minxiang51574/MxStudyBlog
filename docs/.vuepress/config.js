@@ -55,6 +55,10 @@ module.exports = {
                         text:'数据结构与算法',
                         link:'/data/'
                     },
+                    {
+                        text:'开源&文章',
+                        link:'/openSource/'
+                    },
 				],
 				sidebar: {
                     '/bagu/':[
@@ -105,6 +109,9 @@ module.exports = {
                     '/data/':[
                         '',
                         'LeetCode'
+                    ],
+                    '/openSource/':[
+                        '',
                     ]
 				}
 			}
