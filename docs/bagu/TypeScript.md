@@ -7,7 +7,6 @@
 - 提高协同开发的效率
 - 支持强类型、接口、泛型、模块
 
-
 ## 2、手写体：使用TypeScript 实现一个 get 函数来获取它的属性值
 ```js
 const data = { name: 'tom', age: 18, address: 'xxx' }
