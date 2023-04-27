@@ -114,9 +114,6 @@ tree-shaking：模块打包webpack、rollup等中的概念。移除 JavaScript �
 
 - 8、TypeScript 支持
 	
-	
-	
-
 #### 他是如何提升的（How）
 - 响应式系统提升： 使用Proxy提升了响应式的性能和功能
 - 编译优化： 标记和提升所有的静态节点，diff时只需要对比动态节点内容

@@ -1850,7 +1850,7 @@ function traverseNode(node,context){
     }
 }
 ```
-## 编译优化
+## 八、编译优化
 
 ### PatchFlags优化
 Diff算法无法避免新旧虚拟DOM中无用的比较操作，通过patchFlags来标记动态内容，可以实现快速diff算法
