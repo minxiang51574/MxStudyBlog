@@ -1,39 +1,140 @@
-# 一、Git
+# 一、前端工程化工程化
 
-## 1、常用git 命令？
+## 1、什么是前端工程化？
+个人认为，一切有助于降低开发成本、提升开发体验、效率和质量的手段都属于工程化。前端工程化不等同于Webpack，它主要包含从编码、发布到运维的整个前端研发生命周期。
 
+## 2、为什么要重视前端工程化？
+随着前端技术的不断发展和变革，其业务逻辑逐渐变得复杂多样，企业对于前端的应用功能要求也跟着不断提高，例如优化开发流程，提高编码效率和质量，提高项目的可维护性...从一个项目搭建再到部署上线，这里面的每一个过程我们都可以通过前端工程化，提高工作效率。这也是为什么会要求员工会前端工程化的一个重要原因。
+
+其次，前端工程化是前端开发人员的必备技能，从开发，规范，测试，lint，构建，部署，监控，集成，微服务等多个维度，以组合拳的形式，场景化的提升前端工程师的认知。
+
+## 3、工程化四个维度
+### 模块化
+#### cjs (commonjs)
+> 只能在 NodeJS 上运行，使用 require("module") 读取并加载模块
 ```js
-git init                     // 新建 git 代码库
-git add                      // 添加指定文件到暂存区
-git rm                       // 删除工作区文件，并且将这次删除放入暂存区
-git commit -m [message]      // 提交暂存区到仓库区
-git commit --amend           // 修改提交记录文案
-git branch                   // 列出所有分支
-git checkout -b [branch]     // 新建一个分支，并切换到该分支
-git branch -D [branch]       // 删除本地分支
-git push origin --delete     // 删除远程分支
-git status                   // 显示有变更文件的状态
-git stash                    // 储存内容临时空间
-git revert                   // 重置提交 是用一次新的 commit 来回滚（重做）之前的 commit
-git reset                    // 恢复提交  是直接删除指定的 commit
-git rebase                   // 分支变基 变基是将一系列提交移动或组合到新的基本提交的过程
-git cherry-pick              // 把另一个分支的一条记录或者多条记录拿到当前分支
+exports.sum = (x, y) => x + y
+
+const { sum } = require('./sum.js')
 ```
 
-## 2、git pull 和 git fetch 区别
+#### esm (es module)
+> ESM — ECMAScript Module，ES6提出的标准模块系统 ，使用 import export 来管理依赖 ,将 bundle 保存为 ES 模块文件。适用于其他打包工具，在现代浏览器中用 `<script type=module>` 标签引入,package.json 添加 "type": "module" 来使用。
+  
+```js
+  // sum.js
+export const sum = (x, y) => x + y
 
-- git fetch 只是将远程仓库的变化下载下来，并没有和本地分支合并。
-- git pull 会将远程仓库的变化下载下来，并和当前分支合并  git fetch + git merge (默认方式)
+// index.js
+import { sum } from './sum'
+```
+由于 esm 为静态导入，正因如此，可在编译器进行 Tree Shaking，减少 js 体积
+- cjs 模块输出的是一个值的拷贝，esm 输出的是值的引用
+- cjs 模块是运行时加载，esm 是编译时加载
 
-## 3、git rebase 和 git merge 的区别
+#### umd
+> umd - amd和commonjs的统一规范，支持两种规范，即写一套代码，可用于多种场景；并且支持直接在前端用 <script src="lib.umd.js"></script> 的方式加载。
+```js
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD
+    define(['jquery'], factory);
+  } else if (typeof exports === 'object') {
+    // CommonJS
+    module.exports = factory(require('jquery'));
+  } else {
+    // 全局变量
+    root.returnExports = factory(root.jQuery);
+  }
+}(this, function ($) {
+  // ...
+}));
+```
+### 组件化
 
-git merge 和 git rebase 都是用于分支合并，关键**在commit 记录的处理上不同**：
+组件化是 UI 层面上的更细粒度的拆分，一种类似 div 等原生元素的 “自定义元素”。
 
-- git merge 会新建一个新的 commit 对象，然后两个分支以前的 commit 记录都指向这个新 commit 记录。这种方法会保留之前每个分支的 commit 历史。
-- git rebase 会先找到两个分支的第一个共同的 commit 祖先记录，然后将提取当前分支这之后的所有 commit 记录，然后将这个 commit 记录添加到目标分支的最新提交后面。经过这个合并后，两个分支合并后的 commit 记录就变为了线性的记录了。
+组件有自己的 HTML、CSS 和 JS，同时有自己的状态，并支持嵌入到其他组件中并接受外部的数据，可以进行复用。组件化可以看作是 UI 层组织方式的一种模块化。
 
-## 4、使用git rebase构建清晰版本记录
-> [**使用git rebase构建清晰版本记录**](https://mp.weixin.qq.com/s?__biz=MzUyMTg1OTE2MQ==&mid=2247484246&idx=1&sn=9490c8d7c7fc8f7304447e2bca0f0722&chksm=f9d5fa60cea2737642f6557100fcac67525aa846127a90fbb212d0fd8c040a9de43fdf9bba7a&token=1739500914&lang=zh_CN#rd)
+目前主流的 React 和 Vue 前端框架都是基于组件的。
+
+原本的以资源类型为单位进行组织的管理（所有 JS 文件放一个文件夹、CSS 同理），其实维护起来比较困难，也不好复用，组件化的构想是以视觉为单位进行拆分，做了结构、样式、脚本的组装，抽象出一个 “新的元素”。
+
+组件已经是前端开发的基石了，是一种比较合理的抽象
+### 规范化
+
+然后就是前端代码的规范。规范是很重要的，能让代码能够写得更容易更正确，避免一些不必要的错误。
+#### 能想到的规范有:
+- 目录结构规定。
+- 代码风格（包括 JS、HTML、CSS）。
+- 注释规范。
+- commit message 规范。
+- git 工作流规范。
+- Code Review。
+- 请求接口规范
+
+首先是重磅级的 TypeScript。
+
+TS 是有类型的 JS，是 JS 的超集。通过类型，我们可以预测变量的行为，比如一个布尔值类型是不能被作为函数调用的，可能为 undefined 的值需要进行类型收窄后丢弃 undefined 的可能性才能使用
+
+然后是 ESLint,ESLint 能够检测 JS 代码中的错误，主要两个方面
+- 代码质量，比如你不能声明一个没有被使用的变量
+- 代码风格，比如字符串引号必须用单引号
+
+ESLint 有助于统一团队的风格，让代码看起来基本像是一个人写的，避免出现字符串一会用单引号，一会用双引号，变量命名一会用下划线风格，一会用驼峰风格，这种让强迫症抓狂的情况。
+
+[Vue2 eslint+prettier 项目自动格式化](https://blog.csdn.net/weixin_52885562/article/details/121272387)
+
+[Vue3 eslint+prettier 项目自动格式化](https://blog.csdn.net/baidu_41601048/article/details/124226939)
 
 
+然后是 commit message。commit message 我们不希望看到像是 “修复了一些 bug” 这种不够具体的写法，希望具有一定的结构，比如 "fix(工作台): 修复了卡片不能滚动的问题"。
 
+对此我们可以用 commitlint 的命令行工具去判断是否符合特定风格。
+
+当然还需要确保团队成员是使用了这些工具的，我们可以用保存后自动格式化（需要配合编辑器和对应插件）。然后最重要的就是 git hook，可以在本地 commit 时先对 staged 中的文件做风格校验和格式化，然后再检查 commit messge 风格是。如果不对，本地 commit 会失败。对应的工具是 husky
+
+[使用 husky 提交前代码规范校验和 commit 信息检查](https://blog.csdn.net/huangpb123/article/details/102690412)
+
+  
+### 自动化
+重复的可以自动化的流程化工作，应该尽量去自动化。让人去做，对人是一种折磨，然后也不能保证质量，因为通常流程也很复杂，即使是简单，做多了也容易错。
+
+一个小概率事件只要做的次数足够多，它就会变成大概率事件。这也是为什么分布式系统中容错机制是非常重要的原因。
+
+首先想到的自然是 CI/CD（持续集成和持续交付/部署）。我们将代码提交到远端仓库时，或者是给一个分支打了 tag 后，能够触发一些脚本，将我们的项目代码做打包编译，发布成制品，然后发布到生产环境。这些都是自动化的，流程化的。
+
+CI/CD 工具有很多：Jenkins（比较古老了）、GitLab CI/CD、GitHub Action、Docker（发布制品） 和 k8s（容器编排）等。
+
+前面说的 git hook，在本地 commit 时进行一些操作，也算是一种简单的自动化
+
+## 四、打包工具
+前端工程化的核心是打包工具。
+
+打包工具需要支持的 几种重要的能力：
+
+- 1.代码分割：指的将代码划分为可以按需 / 同时加载的多个bundles 或组件的能力。比如动态 import、提取公共依赖模块代码、多个入口文件没有重复代码、支持 ESM 的值引用模拟等。
+- 2.哈希：资源更新时做哈希，防止资源缓存。哈希分很多种，比如文件路径名哈希、内容哈希等。
+- 3.包引入：ES Module、CommonJS 以及从 node_modules 目录引入包的支持。
+- 4.非 JS 资源：导入非 JS 资源的支持，像是 webpack 需要使用各种 loader 来支持，有些打包工具是内置的。
+- 5.输出的模块格式：支持导出为 ES Module、CommonJS 等模块。
+- 6.转换处理：比如对图片压缩、代码压缩、JS 版本降低等，在 webpack 中是使用 plugins 来实现的。
+
+## 五、其他
+还有一些零散的可以提高效率的工具。
+
+- babel：开发时使用高版本的 ES 语言特性，然后生产环境用 babel 转换为低版本的兼容性好的 ES5。打包工具内部其实使用了 babel。
+- tsc：tsc（TS 编译工具） 在支持 TS 的前提下，也支持编译为 JS 低版本。
+- polyfill：低版本的 ES5，想要使用一些新的 API，可以自己写函数去模拟，这就是 polyfill，通常我们会使用 core.js 库，但有些语言层面上的新特性就不能用 polyfill。
+- monorepo：将多个项目放到一个 git 仓库下，方便包的依赖共用和维护。
+- 异常监控：当前端报错时，将相关信息提交到异常监控服务，比如 sentry，通常配合 sourcemap 精确定位源码中的错误位置。
+- 制品库：使用 Nexus 来部署自己的私有制品库，支持各种制品库。比如发布 docker 包、npm 包等，配合发版部署；
+- VSCode Snippet：自定义 VSCode 编辑器的代码片段，可以快速生成一些预置好的代码模板，减少一些模板代码的书写。可以归为自动化。
+- Mock：前端在后端确认返回数据结构后完成接口前，可以通过模拟虚假数据进行调试开发，比如 yapi 平台就是除了支持接口文档，还提供 mock 功能。
+- 单元测试：以模块（比如组件）为单位进行测试，保证代码逻辑符合预期。单元测试通常比较耗时，会在提交到远端时或合并到主分支时进行。流行的单元测试库有 Jest。
+- 热重载：因为每次改代码都要编译，如果整个项目都要重新编译开发体验很差，可以用热重载只编译被修改的模块。
+- 组件库文档：可以用 stroybook。如果是 vue 组件，可以考虑用 Vue Press。
+- Tree shaking：丢掉一些引入了但没有使用的模块
+
+## 六、结尾
+简单来说，前端工程化是对前端开发流程的改良，是效率工具

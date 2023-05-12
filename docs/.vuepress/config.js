@@ -56,7 +56,7 @@ module.exports = {
                         link:'/data/'
                     },
                     {
-                        text:'开源',
+                        text:'开源&文章',
                         link:'/openSource/'
                     },
 				],
@@ -79,7 +79,8 @@ module.exports = {
                         '',
                         'Webpack',
                         'Vite',
-                        '设计模式'
+                        '设计模式',
+                        'Git'
                     ],
                     '/sourceCode/':[
                         '',
@@ -109,6 +110,9 @@ module.exports = {
                     '/data/':[
                         '',
                         'LeetCode'
+                    ],
+                    '/openSource/':[
+                        '',
                     ]
 				}
 			}

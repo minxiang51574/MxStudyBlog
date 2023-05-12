@@ -1,6 +1,5 @@
 # 九、vue项目的性能优化
 
-
 - 1.路由懒加载
 ```js
 component : ()=>import("./xx.vue")
