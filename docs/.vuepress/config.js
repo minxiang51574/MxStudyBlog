@@ -113,6 +113,8 @@ module.exports = {
                     ],
                     '/openSource/':[
                         '',
+                        'mxAdminVue3',
+                        'qiankunExample'
                     ]
 				}
 			}
