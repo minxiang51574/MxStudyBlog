@@ -171,7 +171,7 @@ console.log('start')
 - 2.参数类型判断，传入的参数必须是数组；
 - 3.数组元素类型，判断传入的值是否是promise,使用Promise.resolve 方法会把参数转化为promise；
 - 4.返回结果顺序问题；
-```
+```js
 function PromiseAll(promiseArray){
     return new Promise((resolve,reject)=>{
         // !!! 考点1
@@ -525,3 +525,54 @@ function co(fn) {
 
 
 
+
+
+### 4、实现一个带并发限制的promise异步调度器
+![原型](../images/diaoduqi.png)
+```js
+class Scheduler {
+  constructor() {
+    this.queue = [];
+    this.maxCount = 2;
+    this.runIndex = 0;
+  }
+  add(promiseCreator) {
+    this.queue.push(promiseCreator);
+  }
+  taskStart() {
+    for (let i = 0; i < this.maxCount; i++) {
+      this.request();
+    }
+  }
+  request() {
+    if (!this.queue || !this.queue.length || this.runIndex >= this.maxCount) {
+      return;
+    }
+    this.runIndex++;
+
+    this.queue.shift()().then(() => {
+      this.runIndex--;
+      this.request();
+    });
+  }
+}
+   
+const timeout = time => new Promise(resolve => {
+  setTimeout(resolve, time);
+})
+  
+const scheduler = new Scheduler();
+  
+const addTask = (time,order) => {
+  scheduler.add(() => timeout(time).then(()=>console.log(order)))
+}
+  
+  
+addTask(1000, '1');
+addTask(500, '2');
+addTask(300, '3');
+addTask(400, '4');
+  
+scheduler.taskStart()
+
+```

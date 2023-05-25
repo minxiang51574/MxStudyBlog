@@ -2428,13 +2428,13 @@ methods:{
 
 然后调用`this.setNumber(10)`相当调用`this.$store.commit('SET_NUMBER',10)`
 
-## 六、Vue 3.0
+## 六、Vue 3
 
-### 1. Vue3.0有什么更新
+### 1. Vue3有什么更新
 
 **（1）监测机制的改变**
 
-- 3.0 将带来基于代理 Proxy的 observer 实现，提供全语言覆盖的反应性跟踪。
+- 3 将带来基于代理 Proxy的 observer 实现，提供全语言覆盖的反应性跟踪。
 - 消除了 Vue 2 当中基于 Object.defineProperty 的实现所存在的很多限制：
 
 **（2）只能监测属性，不能监测对象**
@@ -2451,13 +2451,27 @@ methods:{
 **（4）对象式的组件声明方式**
 
 - vue2.x 中的组件是通过声明的方式传入一系列 option，和 TypeScript 的结合需要通过一些装饰器的方式来做，虽然能实现功能，但是比较麻烦。
-- 3.0 修改了组件的声明方式，改成了类式的写法，这样使得和 TypeScript 的结合变得很容易
+- 3修改了组件的声明方式，改成了类式的写法，这样使得和 TypeScript 的结合变得很容易
 
 **（5）其它方面的更改**
 
 - 支持自定义渲染器，从而使得 weex 可以通过自定义渲染器的方式来扩展，而不是直接 fork 源码来改的方式。
 - 支持 Fragment（多个根节点）和 Protal（在 dom 其他部分渲染组建内容）组件，针对一些特殊的场景做了处理。
 - 基于 tree shaking 优化，提供了更多的内置功能。
+
+
+Vue.js 3 是 Vue.js 框架的下一代版本，与 Vue.js 2.x 相比引入了许多重大更改和改进。以下是 Vue.js 2 和 Vue.js 3 之间的一些区别：
+
+- 1. 性能: Vue.js 3 的性能比 Vue.js 2 有所提高。Vue.js 3 使用了一个全新的虚拟 DOM 实现（设计更加高效），并采用了一些针对常见操作的优化（例如 diff 算法的改进）。
+
+- 2. API：Vue.js 3 中的 API 与 Vue.js 2 有很大区别。例如，Vue.js 3 中的 setup() 模式替换了 Vue.js 2 中的 mixins 和高阶组件。Vue.js 3 还引入了一些新的全局 API，例如 createApp()、onMounted() 等等。
+
+- 3. Composition API: Vue.js 3 引入了 Composition API，专门针对组件复用和逻辑组织进行设计。这个 API 可以更好地管理组件策略和让代码更加直观。
+
+- 4. TypeScript: Vue.js 3 对 TypeScript 的支持更好。它提供了强类型ComponentOptions接口，可以让 TypeScript 用户更加轻松地编写类型安全代码。
+
+- 5. Tree shaking: Vue.js 3 进一步优化了它的 Tree shaking，因此您只需引入所需的功能，最小化打包大小。
+
 
 ### 2. defineProperty和proxy的区别
 
@@ -2475,7 +2489,7 @@ Vue3 使用 Proxy 来监控数据的变化。Proxy 是 ES6 中提供的功能，
 1. Proxy 直接代理整个对象而非对象属性，这样只需做一层代理就可以监听同级结构下的所有属性变化，包括新增属性和删除属性。
 2. Proxy 可以监听数组的变化。
 
-### 3. Vue3.0 为什么要用 proxy？
+### 3. Vue3 为什么要用 proxy？
 
 在 Vue2 中， 0bject.defineProperty 会改变原始数据，而 Proxy 是创建对象的虚拟表示，并提供 set 、get 和 deleteProperty 等处理器，这些处理器可在访问或修改原始对象上的属性时进行拦截，有以下特点∶
 
@@ -2489,7 +2503,7 @@ Vue3 使用 Proxy 来监控数据的变化。Proxy 是 ES6 中提供的功能，
 - Set、delete 等触发依赖
 - 对于集合类型，就是对集合对象的方法做一层包装：原方法执行后执行依赖相关的收集或触发逻辑。
 
-### 4.  Vue 3.0 中的 Vue Composition API？
+### 4.  Vue3 中的 Vue Composition API？
 
 在 Vue2 中，代码是 Options API 风格的，也就是通过填充 (option) data、methods、computed 等属性来完成一个 Vue 组件。这种风格使得 Vue 相对于 React极为容易上手，同时也造成了几个问题：
 

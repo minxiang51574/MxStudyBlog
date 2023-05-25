@@ -113,6 +113,7 @@ module.exports = {
                     ],
                     '/openSource/':[
                         '',
+                        'mx-uniapp-template-v2',
                         'mxAdminVue3',
                         'qiankunExample'
                     ]
