@@ -18,6 +18,11 @@ git revert                   // 重置提交 是用一次新的 commit 来回滚
 git reset                    // 恢复提交  是直接删除指定的 commit
 git rebase                   // 分支变基 变基是将一系列提交移动或组合到新的基本提交的过程
 git cherry-pick              // 把另一个分支的一条记录或者多条记录拿到当前分支
+// Git切换远程仓库地址
+git remote rm origin         // 删除原仓库地址
+git remote add origin (仓库地址)  // 添加新仓库地址
+git remote origin set-url （仓库地址） // 直接修改
+git branch -m oldName newName  // 重命名本地分支
 ```
 
 ## 2、git pull 和 git fetch 区别
