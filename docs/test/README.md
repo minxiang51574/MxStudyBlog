@@ -163,10 +163,6 @@ B.wx.connectSocket （WebSocket 连接）的最大并发限制是 5
 降级加载大图资源（我们可以先呈现高度压缩的模糊图片，同时利用一个隐藏的
 节点来加载原图，待原图加载完成后再转移到真实节点上渲染）
 
-## 判断一个对象是数组的方法？
-- Object.prototype.toString.call(xxx)
-- Array.isArray(xxx)
-- xxx instaceOf Array
 
 ## bind有什么用？连续多个bind，最后this指向是什么？
 - bind的作用是改变函数执行的指向，且不会立即执行，而是返回一个新的函数，可以自主调用这个函数的执行,连续多个bind之后this指向始终指向第一个。
