@@ -4,7 +4,7 @@ heroImage: /logo2.png
 actionText: 开始阅读 →
 actionLink: /bagu/
 # heroText: Welcome to hep.
-tagline: 不积跬步无以至千里
+# tagline: 不积跬步无以至千里
 # features:
 # - title: 关于我
 #   details: 
