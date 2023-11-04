@@ -167,8 +167,8 @@ B.wx.connectSocket （WebSocket 连接）的最大并发限制是 5
 ## bind有什么用？连续多个bind，最后this指向是什么？ 
 bind的作用是改变函数执行的指向，且不会立即执行，而是返回一个新的函数，可以自主调用这个函数的执行,连续多个bind之后this指向始终指向第一个。
 
-<!-- ## DOMContentLoaded和load的区别
+## DOMContentLoaded和load的区别
 
 - 当初始的 HTML 文档被完全加载和解析完成之后，DOMContentLoaded 事件被触发，而无需等待样式表、图像和子框架的完全加载
-- load 仅用于检测一个完全加载的页面，页面的html、css、js、图片等资源都已经加载完之后才会触发 load 事件 -->
+- load 仅用于检测一个完全加载的页面，页面的html、css、js、图片等资源都已经加载完之后才会触发 load 事件
 
