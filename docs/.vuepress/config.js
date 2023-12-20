@@ -102,11 +102,14 @@ module.exports = {
                         'Vue2',
                         'Vue3',
                     ],
+                    
                     '/vueBase/': [
                         '',
                     ],
                     '/node/': [],
-                    '/test/': [],
+                    '/test/': [
+                        '',
+                    ],
                     '/data/':[
                         '',
                         'LeetCode'

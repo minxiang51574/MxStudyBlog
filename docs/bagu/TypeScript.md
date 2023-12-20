@@ -7,22 +7,24 @@
 - 提高协同开发的效率
 - 支持强类型、接口、泛型、模块
 
-## 2、手写体：使用TypeScript 实现一个 get 函数来获取它的属性值
+## 2、使用TypeScript 实现一个 get 函数来获取它的属性值
 ```js
 const data = { name: 'tom', age: 18, address: 'xxx' }
 ```
 
 ```js
-const get = <T extends object, K extends keyof T>(obj: T, key: K): T[K] => {
+// extends 类型约束
+const get = <T extends data, K extends keyof T>(obj: T, key: K): T[K] => {
   return obj[key]
 }
+
 ```
 
 ## 3、any 、 unknown 的区别？
 - any：变量如果是 any 类型，绕过所有类型检查，直接可使用
 - unknown：变量如果是 unknow 类型，需要判断完是什么类型之后才能使用
 
-## 4、keyof？
+## 4、keyof 类型索引 ？
 将一个interface的所有key，汇聚成一个联合类型，可以用来对传入key的限制，比如：
 ```js
 interface Target {
@@ -110,7 +112,7 @@ type User = { age : number };
 - public：在类的内部和外部都可以访问，可以继承、实例化
 - private：私有属性只能在基类中访问，不能在实例、派生类中访问
 - protected：受保护的，可以被继承，在派生类中可以访问，子类、父类都不能实例访问
-- static 只能通过基类、子类访问，实例不能访问
+- static 只能通过基类、子类访问，实例不能访问。有static修饰的成员属于类本身，没有static修饰的成员属于类的实例
 - abstract 抽象类中的抽象方法不包含具体实现并且必须在派生类中实现
 
 ## 7、泛型
